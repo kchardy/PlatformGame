@@ -2,6 +2,7 @@ package com.kchardy.game;
 
 import com.kchardy.game.entity.Entity;
 import com.kchardy.game.tile.Tile;
+import com.kchardy.game.tile.Wall;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -10,6 +11,11 @@ public class Handler {
 
     public LinkedList <Entity> entity = new LinkedList<Entity>();
     public LinkedList <Tile> tile = new LinkedList<Tile>();
+
+    public Handler()
+    {
+        createLevel();
+    }
 
     public void render(Graphics g)
     {
@@ -55,5 +61,16 @@ public class Handler {
     public void removeTile(Tile ti)
     {
         tile.remove(ti);
+    }
+
+    public void createLevel()
+    {
+        for(int i = 0; i < Game.WIDTH*Game.SCALE/64+1; i++)
+        {
+            addTile(new Wall(i*64, Game.HEIGHT*Game.SCALE - 6, 64, 64, true, Id.wall, this)); // -64 zamiast 6
+            if(i!=0 && i!=1 && i!=7 && i!=8 && i!=9)
+                addTile(new Wall(i*64, 300, 64, 32, true, Id.wall, this)); // -64 zamiast 6
+
+        }
     }
 }

@@ -11,10 +11,14 @@ public abstract class Entity {
     public int width, height;
 
     public boolean solid;
+    public boolean jumping = false;
+    public boolean falling = true;
 
     public int velX, velY;
 
     public Id id;
+
+    public double gravity = 0.0;
 
     public Handler handler;
 
@@ -54,14 +58,6 @@ public abstract class Entity {
     {
         return id;
     }
-//
-//    public int getVelX() {
-//        return velX;
-//    }
-//
-//    public int getVelY() {
-//        return velY;
-//    }
 
     public void setX(int x) {
         this.x = x;

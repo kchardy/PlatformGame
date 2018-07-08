@@ -40,12 +40,27 @@ public class Player extends Entity{
                 if(getBoundsTop().intersects(ti.getBounds()))
                 {
                     setVelY(0);
-                    y = ti.getY() + ti.height;
+                    if(jumping)
+                    {
+                        jumping = false;
+                        gravity = 0.0;
+                        falling = true;
+                    }
+//                    y = ti.getY() + ti.height;
                 }
                 if(getBoundsBottom().intersects(ti.getBounds()))
                 {
                     setVelY(0);
-                    y = ti.getY() - ti.height;
+//                    y = ti.getY() - ti.height;
+                    if(falling) falling = false;
+                }
+                else
+                {
+                    if(!falling && !jumping)
+                    {
+                        gravity = 0.0;
+                        falling = true;
+                    }
                 }
                 if(getBoundsLeft().intersects(ti.getBounds()))
                 {
@@ -58,6 +73,21 @@ public class Player extends Entity{
                     x = ti.getX() - ti.width;
                 }
             }
+        }
+        if(jumping)
+        {
+            gravity -= 0.1;
+            setVelY((int) -gravity);
+            if(gravity <= 0.0)
+            {
+                jumping = false;
+                falling = true;
+            }
+        }
+        if(falling)
+        {
+            gravity += 0.1;
+            setVelY((int) gravity);
         }
     }
 }

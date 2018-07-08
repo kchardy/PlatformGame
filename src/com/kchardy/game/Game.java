@@ -35,7 +35,7 @@ public class Game extends Canvas implements Runnable{
         addKeyListener(new KeyInput());
 
         handler.addEntity(new Player(100, 500, 64, 64, true, Id.player, handler));
-        handler.addTile(new Wall(200, 200, 64, 64, true, Id.wall, handler));
+//        handler.addTile(new Wall(200, 200, 64, 64, true, Id.wall, handler));
     }
 
     private synchronized void start()
@@ -100,10 +100,9 @@ public class Game extends Canvas implements Runnable{
             return;
         }
         Graphics g = bs.getDrawGraphics();
-        g.setColor(new Color(124, 28, 97));//new Color(124, 28, 97)
+        g.setColor(Color.BLACK);
         g.fillRect(0,0, getWidth(), getHeight());
-        g.setColor(Color.MAGENTA);
-        g.fillRect(200, 200, getWidth()-400, getHeight()-400);
+
         handler.render(g);
         g.dispose();
         bs.show(); // wyświetlenie

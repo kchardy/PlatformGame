@@ -21,12 +21,19 @@ public class KeyInput implements KeyListener {
             {
                 case KeyEvent.VK_W:
                    // en.velY += -1;  przyspiesza jak dluzej przytrzymasz
-                    en.setVelY(-1);
+                   // en.setVelY(-1);
+                    if(!en.jumping)
+                    {
+                        en.jumping = true;
+                        en.gravity = 9.0;
+                    }
+
+
                     break;
-                case KeyEvent.VK_S:
-                    //en.velY += 1;
-                    en.setVelY(1);
-                    break;
+//                  case KeyEvent.VK_S:
+//                    //en.velY += 1;
+//                    en.setVelY(1);
+//                    break;
                 case KeyEvent.VK_A:
                    // en.velX += -1;
                     en.setVelX(-1);
