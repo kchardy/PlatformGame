@@ -1,5 +1,6 @@
 package com.kchardy.game.entity;
 
+import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.tile.Tile;
@@ -8,14 +9,25 @@ import java.awt.*;
 
 public class Player extends Entity{
 
+    private int frame = 0;
+    private int frameDelay = 0;
+
+    private boolean animate = false;
+
     public Player(int x, int y, int width, int height, boolean solid, Id id, Handler handler) {
         super(x, y, width, height, solid, id, handler);
     }
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.fillRect(x, y, width, height);
+        if(facing == 0)
+        {
+            g.drawImage(Game.player[frame+5].getBufferedImage(),x, y, width, height, null);//+5
+        }
+        else if(facing == 1)
+        {
+            g.drawImage(Game.player[frame].getBufferedImage(),x, y, width, height, null);
+        }
     }
 
     @Override
@@ -25,12 +37,15 @@ public class Player extends Entity{
 
         if(x <= 0)
             x = 0;
-        if(y <= 0)
-            y = 0;
-        if(x+width >= 810)//(width/14*10*3)) //WIDTH/14*10*SCALE        // prze SCALE = 4 ->1080
-            x = 810 - width;
-        if(y+height >= 578)//(width/14*10*3)) //WIDTH/14*10*SCALE        // prze SCALE = 4 ->771
-            y = 578 - height;
+//        if(y <= 0)
+//            y = 0;
+//        if(x+width >= 810)//(width/14*10*3)) //WIDTH/14*10*SCALE        // prze SCALE = 4 ->1080
+//            x = 810 - width;
+//        if(y+height >= 578)//(width/14*10*3)) //WIDTH/14*10*SCALE        // prze SCALE = 4 ->771
+//            y = 578 - height;
+        if(velX!=0)
+            animate = true;
+        else animate = false;
 
         for(Tile ti : handler.tile)
         {
@@ -43,22 +58,20 @@ public class Player extends Entity{
                     if(jumping)
                     {
                         jumping = false;
-                        gravity = 0.0;
+                        gravity = -0.8;
                         falling = true;
                     }
-//                    y = ti.getY() + ti.height;
                 }
                 if(getBoundsBottom().intersects(ti.getBounds()))
                 {
                     setVelY(0);
-//                    y = ti.getY() - ti.height;
                     if(falling) falling = false;
                 }
                 else
                 {
                     if(!falling && !jumping)
                     {
-                        gravity = 0.0;
+                        gravity = -0.8;
                         falling = true;
                     }
                 }
@@ -71,6 +84,25 @@ public class Player extends Entity{
                 {
                     setVelX(0);
                     x = ti.getX() - ti.width;
+                }
+            }
+        }
+
+        for(int i = 0; i < handler.entity.size(); i++)
+        {
+            Entity e = handler.entity.get(i);   //mushroom episode
+
+            if(e.getId() == Id.mushroom)
+            {
+                if(getBounds().intersects(e.getBounds())) // collading with the mushroom
+                {
+                    int tpX = getX();
+                    int tpY = getY();
+                    width *= 2;
+                    height *= 2;
+                    e.setVelX(tpX - width);// setVelX(tpX - width);// - width);
+                    e.setVelY(tpY - height);// - height);
+                    e.die();
                 }
             }
         }
@@ -88,6 +120,17 @@ public class Player extends Entity{
         {
             gravity += 0.1;
             setVelY((int) gravity);
+        }
+        if(animate)
+        {
+            frameDelay++;
+            if(frameDelay >= 3)
+            {
+                frame++;
+                if(frame >= 6)//5
+                    frame = 0;//0
+                frameDelay = 0;
+            }
         }
     }
 }

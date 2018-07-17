@@ -1,10 +1,13 @@
 package com.kchardy.game;
 
 import com.kchardy.game.entity.Entity;
+import com.kchardy.game.entity.Player;
+import com.kchardy.game.entity.powerup.Mushroom;
 import com.kchardy.game.tile.Tile;
 import com.kchardy.game.tile.Wall;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
 public class Handler {
@@ -14,7 +17,7 @@ public class Handler {
 
     public Handler()
     {
-        createLevel();
+        //createLevel();
     }
 
     public void render(Graphics g)
@@ -63,14 +66,35 @@ public class Handler {
         tile.remove(ti);
     }
 
-    public void createLevel()
+    public void createLevel(BufferedImage level)
     {
-        for(int i = 0; i < Game.WIDTH*Game.SCALE/64+1; i++)
-        {
-            addTile(new Wall(i*64, Game.HEIGHT*Game.SCALE - 6, 64, 64, true, Id.wall, this)); // -64 zamiast 6
-            if(i!=0 && i!=1 && i!=7 && i!=8 && i!=9)
-                addTile(new Wall(i*64, 300, 64, 32, true, Id.wall, this)); // -64 zamiast 6
+        int width = level.getWidth();
+        int height = level.getHeight();
 
+        for(int y = 0;y < height;y++)
+        {
+            for (int x = 0;x < width;x++)
+            {
+                int pixel = level.getRGB(x, y);
+
+                int red = (pixel >> 16) & 0xff;
+                int green = (pixel >> 8) & 0xff;
+                int blue = (pixel) & 0xff;
+
+                if(red==0 && green==0 && blue==0)
+                    addTile(new Wall(x*64, y*64, 64, 64,true, Id.wall, this));//64
+               // if(red==0 && green==0 && blue==255)
+                //    addEntity(new Player(x*64, y*64, 64, 64,false, Id.player, this));
+                if(red==255 && green==0 && blue==0)
+                    addEntity(new Mushroom(x*64, y*64, 64, 64,true, Id.mushroom, this));
+            }
         }
+//        for(int i = 0; i < Game.WIDTH*Game.SCALE/64+1; i++)
+//        {
+//            addTile(new Wall(i*64, Game.HEIGHT*Game.SCALE - 6, 64, 64, true, Id.wall, this)); // -64 zamiast 6
+//            if(i!=0 && i!=1 && i!=7 && i!=8 && i!=9)
+//                addTile(new Wall(i*64, 300, 64, 32, true, Id.wall, this)); // -64 zamiast 6
+//
+//        }
     }
 }

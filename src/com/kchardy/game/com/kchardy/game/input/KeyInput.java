@@ -1,6 +1,7 @@
 package com.kchardy.game.com.kchardy.game.input;
 
 import com.kchardy.game.Game;
+import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
 
 import java.awt.event.KeyEvent;
@@ -17,32 +18,36 @@ public class KeyInput implements KeyListener {
         int key = e.getKeyCode();
         for(Entity en: Game.handler.entity)
         {
-            switch (key)
+            if(en.getId() == Id.player)
             {
-                case KeyEvent.VK_W:
-                   // en.velY += -1;  przyspiesza jak dluzej przytrzymasz
-                   // en.setVelY(-1);
-                    if(!en.jumping)
-                    {
-                        en.jumping = true;
-                        en.gravity = 9.0;
-                    }
-
-
-                    break;
+                switch (key)
+                {
+                    case KeyEvent.VK_W:
+                        // en.velY += -1;  przyspiesza jak dluzej przytrzymasz
+                        // en.setVelY(-1);
+                        if(!en.jumping)
+                        {
+                            en.jumping = true;
+                            en.gravity = 9.0;
+                        }
+                        break;
 //                  case KeyEvent.VK_S:
 //                    //en.velY += 1;
 //                    en.setVelY(1);
 //                    break;
-                case KeyEvent.VK_A:
-                   // en.velX += -1;
-                    en.setVelX(-1);
-                    break;
-                case KeyEvent.VK_D:
-                    //en.velX += 1;
-                    en.setVelX(1);
-                    break;
+                    case KeyEvent.VK_A:
+                        // en.velX += -1;
+                        en.setVelX(-1);
+                        en.facing = 1;
+                        break;
+                    case KeyEvent.VK_D:
+                        //en.velX += 1;
+                        en.setVelX(1);
+                        en.facing = 0;
+                        break;
+                }
             }
+
         }
 
     }
@@ -53,21 +58,25 @@ public class KeyInput implements KeyListener {
 
         for(Entity en: Game.handler.entity)
         {
-            switch (key)
+            if(en.getId() == Id.player)
             {
-                case KeyEvent.VK_W:
-                    en.setVelY(0);
-                    break;
-                case KeyEvent.VK_S:
-                    en.setVelY(0);
-                    break;
-                case KeyEvent.VK_A:
-                    en.setVelX(0);
-                    break;
-                case KeyEvent.VK_D:
-                    en.setVelX(0);
-                    break;
+                switch (key)
+                {
+                    case KeyEvent.VK_W:
+                        en.setVelY(0);
+                        break;
+                    case KeyEvent.VK_S:
+                        en.setVelY(0);
+                        break;
+                    case KeyEvent.VK_A:
+                        en.setVelX(0);
+                        break;
+                    case KeyEvent.VK_D:
+                        en.setVelX(0);
+                        break;
+                }
             }
+
         }
     }
 }

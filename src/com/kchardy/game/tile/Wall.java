@@ -1,5 +1,6 @@
 package com.kchardy.game.tile;
 
+import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 
@@ -12,8 +13,9 @@ public class Wall extends Tile {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillRect(x, y, width, height);
+        g.drawImage(Game.grass.getBufferedImage(),x, y, width, height, null);
+//        g.setColor(Color.RED);
+//        g.fillRect(x, y, width, height);
     }
 
     @Override

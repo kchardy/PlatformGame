@@ -9,6 +9,7 @@ public abstract class Entity {
 
     public int x, y;
     public int width, height;
+    public int facing = 0;  //0 - left, 1 - right
 
     public boolean solid;
     public boolean jumping = false;
