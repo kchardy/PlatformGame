@@ -1,5 +1,5 @@
 package com.kchardy.game;
 
 public enum Id {
-    wall, mushroom, player
+    wall, potion, goblin, chest, player
 }

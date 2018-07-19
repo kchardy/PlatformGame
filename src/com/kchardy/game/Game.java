@@ -4,7 +4,7 @@ import com.kchardy.game.com.kchardy.game.graphics.Sprite;
 import com.kchardy.game.com.kchardy.game.graphics.SpriteSheet;
 import com.kchardy.game.com.kchardy.game.input.KeyInput;
 import com.kchardy.game.entity.Entity;
-import com.kchardy.game.entity.Player;
+import com.kchardy.game.entity.mob.Player;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -27,8 +27,11 @@ public class Game extends Canvas implements Runnable{
     public static Handler handler;
     public static SpriteSheet sheet;
     public static Sprite player[] = new Sprite[12];
-    public static Sprite grass;
-    public static Sprite mushroom;
+    public static Sprite goblin[] = new Sprite[12];
+    public static Sprite brick;
+    public static Sprite potion;
+    public static Sprite chest;
+    public static Sprite openedChest;
     public static Camera cam;
 
     public Game()
@@ -42,18 +45,25 @@ public class Game extends Canvas implements Runnable{
     private void init()
     {
         handler = new Handler();
-        sheet = new SpriteSheet("/spritesheet.png");
+        sheet = new SpriteSheet("/spritesheet2.png");
         cam = new Camera();
 
         addKeyListener(new KeyInput());
 
-        grass = new Sprite(sheet ,1, 1);
-        mushroom = new Sprite(sheet,2, 1);
+        brick = new Sprite(sheet ,1, 1);
+        potion = new Sprite(sheet,2, 1);
+        chest = new Sprite(sheet, 3, 1);
+        openedChest = new Sprite(sheet, 4, 1);
 
 
         for(int i = 0; i < player.length; i++)
         {
             player[i] = new Sprite(sheet, i+1, 16);
+        }
+
+        for(int i = 0; i < goblin.length; i++)
+        {
+            goblin[i] = new Sprite(sheet, i+1, 15);
         }
 
         try
@@ -66,7 +76,7 @@ public class Game extends Canvas implements Runnable{
         }
         handler.createLevel(image);
 
-        handler.addEntity(new Player(100, 500, 64, 64, false, Id.player, handler));// on go nie ma, ale mi z tym dzialalo(do sprawdzenia)
+        handler.addEntity(new Player(100, 500, 64, 64, Id.player, handler));
     }
 
     private synchronized void start()

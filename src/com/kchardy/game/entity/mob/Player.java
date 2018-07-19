@@ -1,21 +1,22 @@
-package com.kchardy.game.entity;
+package com.kchardy.game.entity.mob;
 
 import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
+import com.kchardy.game.entity.Entity;
 import com.kchardy.game.tile.Tile;
 
 import java.awt.*;
 
-public class Player extends Entity{
+public class Player extends Entity {
 
     private int frame = 0;
     private int frameDelay = 0;
 
     private boolean animate = false;
 
-    public Player(int x, int y, int width, int height, boolean solid, Id id, Handler handler) {
-        super(x, y, width, height, solid, id, handler);
+    public Player(int x, int y, int width, int height, Id id, Handler handler) {
+        super(x, y, width, height, id, handler);
     }
 
     @Override
@@ -86,23 +87,40 @@ public class Player extends Entity{
                     x = ti.getX() - ti.width;
                 }
             }
+            if(ti.getId() == Id.chest)
+            {
+                if(getBoundsTop().intersects(ti.getBounds()))
+                    ti.activated = true;
+            }
         }
+
 
         for(int i = 0; i < handler.entity.size(); i++)
         {
             Entity e = handler.entity.get(i);   //mushroom episode
 
-            if(e.getId() == Id.mushroom)
+            if(e.getId() == Id.potion)
             {
                 if(getBounds().intersects(e.getBounds())) // collading with the mushroom
                 {
                     int tpX = getX();
                     int tpY = getY();
-                    width *= 2;
-                    height *= 2;
+                    width *= 1.4;//2
+                    height *= 1.4;//2
                     e.setVelX(tpX - width);// setVelX(tpX - width);// - width);
                     e.setVelY(tpY - height);// - height);
                     e.die();
+                }
+            }
+            else if(e.getId() == Id.goblin)
+            {
+                if(getBoundsBottom().intersects(e.getBoundsTop()))
+                {
+                    e.die();
+                }
+                else if(getBounds().intersects(e.getBounds()))
+                {
+                    die();
                 }
             }
         }
@@ -115,6 +133,7 @@ public class Player extends Entity{
                 jumping = false;
                 falling = true;
             }
+
         }
         if(falling)
         {

@@ -9,11 +9,11 @@ import com.kchardy.game.tile.Tile;
 import java.awt.*;
 import java.util.Random;
 
-public class Mushroom extends Entity {
+public class Potion extends Entity {
 
     private Random random = new Random();
-    public Mushroom(int x, int y, int width, int height, boolean solid, Id id, Handler handler) {
-        super(x, y, width, height, solid, id, handler);
+    public Potion(int x, int y, int width, int height, Id id, Handler handler) {
+        super(x, y, width, height, id, handler);
 
         int direction = random.nextInt(2);
 
@@ -30,7 +30,7 @@ public class Mushroom extends Entity {
 
     @Override
     public void render(Graphics g) {
-        g.drawImage(Game.mushroom.getBufferedImage(), x, y, width, height, null);
+        g.drawImage(Game.potion.getBufferedImage(), x, y, width, height, null);
     }
 
     @Override

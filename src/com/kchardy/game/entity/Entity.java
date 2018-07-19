@@ -11,7 +11,6 @@ public abstract class Entity {
     public int width, height;
     public int facing = 0;  //0 - left, 1 - right
 
-    public boolean solid;
     public boolean jumping = false;
     public boolean falling = true;
 
@@ -23,13 +22,12 @@ public abstract class Entity {
 
     public Handler handler;
 
-    public Entity(int x, int y, int width, int height, boolean solid, Id id, Handler handler)
+    public Entity(int x, int y, int width, int height, Id id, Handler handler)
     {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.solid = solid;
         this.id = id;
         this.handler = handler;
     }
@@ -49,10 +47,6 @@ public abstract class Entity {
 
     public int getY() {
         return y;
-    }
-
-    public boolean isSolid() {
-        return solid;
     }
 
     public Id getId()

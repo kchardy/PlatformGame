@@ -1,8 +1,9 @@
 package com.kchardy.game;
 
 import com.kchardy.game.entity.Entity;
-import com.kchardy.game.entity.Player;
-import com.kchardy.game.entity.powerup.Mushroom;
+import com.kchardy.game.entity.mob.Goblin;
+import com.kchardy.game.entity.powerup.Potion;
+import com.kchardy.game.tile.Chest;
 import com.kchardy.game.tile.Tile;
 import com.kchardy.game.tile.Wall;
 
@@ -86,7 +87,10 @@ public class Handler {
                // if(red==0 && green==0 && blue==255)
                 //    addEntity(new Player(x*64, y*64, 64, 64,false, Id.player, this));
                 if(red==255 && green==0 && blue==0)
-                    addEntity(new Mushroom(x*64, y*64, 64, 64,true, Id.mushroom, this));
+                    addTile(new Chest(x*64, y*64, 64, 64, true,Id.chest, this, Game.potion));
+                   // addEntity(new Potion(x*64, y*64, 64, 64, Id.potion, this));
+                if(red==0 && green==255 && blue==0)
+                    addEntity(new Goblin(x*64, y*64, 64, 64, Id.goblin, this));
             }
         }
 //        for(int i = 0; i < Game.WIDTH*Game.SCALE/64+1; i++)
