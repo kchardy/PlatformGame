@@ -4,19 +4,24 @@ import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
+import com.kchardy.game.states.BossStade;
+import com.kchardy.game.states.PlayerState;
 import com.kchardy.game.tile.Tile;
 
 import java.awt.*;
 
 public class Player extends Entity {
 
+    private PlayerState state;
+
     private int frame = 0;
     private int frameDelay = 0;
-
-    private boolean animate = false;
+    private int pixelsTravelled = 0;
 
     public Player(int x, int y, int width, int height, Id id, Handler handler) {
         super(x, y, width, height, id, handler);
+
+        state = PlayerState.SMALL;
     }
 
     @Override
@@ -36,119 +41,210 @@ public class Player extends Entity {
         x += velX;
         y += velY;
 
-        if(x <= 0)
-            x = 0;
+//        if(x <= 0)
+//            x = 0;
 //        if(y <= 0)
 //            y = 0;
 //        if(x+width >= 810)//(width/14*10*3)) //WIDTH/14*10*SCALE        // prze SCALE = 4 ->1080
 //            x = 810 - width;
 //        if(y+height >= 578)//(width/14*10*3)) //WIDTH/14*10*SCALE        // prze SCALE = 4 ->771
 //            y = 578 - height;
-        if(velX!=0)
-            animate = true;
-        else animate = false;
 
-        for(Tile ti : handler.tile)
-        {
-            if(!ti.solid) break;
-            if(ti.getId()== Id.wall)
-            {
-                if(getBoundsTop().intersects(ti.getBounds()))
-                {
-                    setVelY(0);
-                    if(jumping)
+        //----------------
+//        if(velX!=0)
+//            animate = true;
+//        else animate = false;
+
+//        if(goingDown)
+//        {
+//            pixelsTravelled += velY;
+//        }
+
+       // for(Tile ti : handler.tile)
+        for(int i = 0; i<handler.tile.size();i++) {
+            Tile ti = handler.tile.get(i);
+            if (ti.isSolid() && !goingDown)
+            { ///dodane
+              //  if (ti.getId() == Id.wall) //nie bylo
+               // {
+                    if (getBoundsTop().intersects(ti.getBounds()) && ti.getId() != Id.coin )
                     {
-                        jumping = false;
-                        gravity = -0.8;
-                        falling = true;
+                        setVelY(0);
+                        if (jumping && !goingDown) {
+                            jumping = false;
+                            gravity = 0.8;
+                            falling = true;
+                        }
+                        if (ti.getId() == Id.chest)
+                        {
+                            if (getBounds().intersects(ti.getBounds()))
+                                ti.activated = true;
+                        }
                     }
-                }
-                if(getBoundsBottom().intersects(ti.getBounds()))
-                {
-                    setVelY(0);
-                    if(falling) falling = false;
-                }
-                else
-                {
-                    if(!falling && !jumping)
+                    if (getBoundsBottom().intersects(ti.getBounds()) && ti.getId() != Id.coin)
                     {
-                        gravity = -0.8;
-                        falling = true;
+                        setVelY(0);
+                        if (falling) falling = false;
                     }
-                }
-                if(getBoundsLeft().intersects(ti.getBounds()))
-                {
-                    setVelX(0);
-                    x = ti.getX() + ti.width;
-                }
-                if(getBoundsRight().intersects(ti.getBounds()))
-                {
-                    setVelX(0);
-                    x = ti.getX() - ti.width;
-                }
-            }
-            if(ti.getId() == Id.chest)
-            {
-                if(getBoundsTop().intersects(ti.getBounds()))
-                    ti.activated = true;
+                    else if (!falling && !jumping)
+                    {
+                        falling = true;
+                        gravity = 0.8; // -0,8
+                    }
+                    if (getBoundsLeft().intersects(ti.getBounds()) && ti.getId() != Id.coin)
+                    {
+                        setVelX(0);
+                        x = ti.getX() + ti.width;
+                    }
+                    if (getBoundsRight().intersects(ti.getBounds())&& ti.getId() != Id.coin)
+                    {
+                        setVelX(0);
+                        x = ti.getX() - ti.width;
+                    }
+                    //dodane 
+                    if(getBounds().intersects(ti.getBounds()) && ti.getId() == Id.coin)
+                    {
+                        Game.coins++;
+                        ti.die();
+                    }
             }
         }
-
 
         for(int i = 0; i < handler.entity.size(); i++)
         {
-            Entity e = handler.entity.get(i);   //mushroom episode
-
+            Entity e = handler.entity.get(i);
             if(e.getId() == Id.potion)
             {
-                if(getBounds().intersects(e.getBounds())) // collading with the mushroom
+                switch (e.getType())
                 {
-                    int tpX = getX();
-                    int tpY = getY();
-                    width *= 1.4;//2
-                    height *= 1.4;//2
-                    e.setVelX(tpX - width);// setVelX(tpX - width);// - width);
-                    e.setVelY(tpY - height);// - height);
-                    e.die();
+                    case 0:
+                        if(getBounds().intersects(e.getBounds()))
+                        {
+                            int tpX = getX();
+                            int tpY = getY();
+                            width+=(width/3);
+                            height+=(height/3);
+                            setX(tpX - width);
+                            setY(tpY - height);
+                            if(state == PlayerState.SMALL)
+                                state = PlayerState.BIG;
+                            e.die();
+                        }
+                        break;
+                    case 1:
+                        if(getBounds().intersects(e.getBounds()))
+                        {
+                            Game.lives++;
+                            e.die();
+                        }
+                        break;
+
                 }
+
             }
-            else if(e.getId() == Id.goblin)
+            else if(e.getId() == Id.goblin || e.getId() == Id.towerBoss)
             {
                 if(getBoundsBottom().intersects(e.getBoundsTop()))
                 {
-                    e.die();
+                    if(e.getId() != Id.towerBoss)
+                            e.die();
+                    else if(e.attackable)
+                    {
+                        e.hp--;
+                        e.falling = true;
+                        e.gravity = 3.0;
+                        e.bossStade = BossStade.RECOVERING;
+                        e.attackable = false;
+                        e.phaseTime = 0;
+
+                        jumping = true;
+                        falling = false;
+                        gravity = 3.5;
+                    }
                 }
-                else if(getBounds().intersects(e.getBounds()))
+                else if(getBounds().intersects(e.getBoundsRight()) || getBounds().intersects(e.getBoundsLeft()) ||
+                        getBounds().intersects(e.getBoundsBottom()))
                 {
-                    die();
+                    if(state == PlayerState.BIG)
+                    {
+                        state = PlayerState.SMALL;
+                        width/=3;
+                        height/=3;
+                        x+=width;
+                        y+=height;
+                    }
+                    else if(state == PlayerState.SMALL)
+                    {
+                        die();
+                    }
+                }
+
+            }
+            else if(e.getId() == Id.coin)
+            {
+                if(getBounds().intersects(e.getBounds()) && e.getId() == Id.coin)
+                {
+                    Game.coins ++;
+                    e.die();
                 }
             }
         }
-        if(jumping)
+        if(jumping && !goingDown)
         {
-            gravity -= 0.1;
+            gravity -= 0.1;//0,15
             setVelY((int) -gravity);
-            if(gravity <= 0.0)
+            if(gravity <= 0.0)//0,6
             {
                 jumping = false;
                 falling = true;
             }
 
         }
-        if(falling)
+        if(falling && !goingDown)
         {
-            gravity += 0.1;
+            gravity += 0.1;//0,15
             setVelY((int) gravity);
         }
-        if(animate)
+        if(velX!=0)
         {
             frameDelay++;
-            if(frameDelay >= 3)
+            if(frameDelay >= 20)//3 // 10
             {
                 frame++;
-                if(frame >= 6)//5
-                    frame = 0;//0
+                if(frame >= 6)//5 dlugosc obrazkow w jedna strone
+                    frame = 0;
                 frameDelay = 0;
+            }
+        }
+        if(goingDown)
+        {
+            for(int i = 0; i<Game.handler.tile.size();i++)
+            {
+                Tile t = Game.handler.tile.get(i);
+                if(t.getId()==Id.ladder)
+                {
+                    if(getBounds().intersects(t.getBounds()))
+                    {
+                        switch (facing)
+                        {
+                            case 0:
+                                setVelY(-5); // lub -1
+                                setVelY(0);
+                                pixelsTravelled+=-velY;
+                                break;
+                            case 2:
+                                setVelY(5);
+                                setVelX(0);
+                                pixelsTravelled+=velY;
+                                break;
+                        }
+                        if(pixelsTravelled > t.height)
+                        {
+                             goingDown = false;
+                             pixelsTravelled = 0;
+                        }
+                    }
+                }
             }
         }
     }

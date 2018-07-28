@@ -9,11 +9,13 @@ import com.kchardy.game.tile.Tile;
 import java.awt.*;
 import java.util.Random;
 
+
 public class Potion extends Entity {
 
     private Random random = new Random();
-    public Potion(int x, int y, int width, int height, Id id, Handler handler) {
+    public Potion(int x, int y, int width, int height, Id id, Handler handler, int type) {
         super(x, y, width, height, id, handler);
+        this.type = type;
 
         int direction = random.nextInt(2);
 
@@ -30,7 +32,15 @@ public class Potion extends Entity {
 
     @Override
     public void render(Graphics g) {
-        g.drawImage(Game.potion.getBufferedImage(), x, y, width, height, null);
+        switch (getType())
+        {
+            case 0:
+                g.drawImage(Game.growPotion.getBufferedImage(), x, y, width, height, null);
+                break;
+            case 1:
+                g.drawImage(Game.lifePotion.getBufferedImage(), x, y, width, height, null);
+                break;
+        }
     }
 
     @Override
@@ -40,7 +50,8 @@ public class Potion extends Entity {
 
         for(Tile ti : handler.tile)
         {
-            if(!ti.solid) break;
+            if(!ti.solid)
+                break;
                 if(getBoundsBottom().intersects(ti.getBounds()))
                 {
                     setVelY(0);
@@ -50,7 +61,7 @@ public class Potion extends Entity {
                 {
                     if(!falling)
                     {
-                        gravity = -0.8;
+                        gravity = 0.8;
                         falling = true;
                     }
                 }

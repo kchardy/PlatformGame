@@ -3,6 +3,7 @@ package com.kchardy.game.com.kchardy.game.input;
 import com.kchardy.game.Game;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
+import com.kchardy.game.tile.Tile;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -20,9 +21,25 @@ public class KeyInput implements KeyListener {
         {
             if(en.getId() == Id.player)
             {
+                if(en.goingDown)
+                    return;
                 switch (key)
                 {
                     case KeyEvent.VK_W:
+                        for(int k = 0; k<Game.handler.tile.size();k++)
+                        {
+                            Tile t = Game.handler.tile.get(k);
+                            if(t.getId() == Id.ladder)
+                            {
+                                if(en.getBoundsTop().intersects(t.getBounds()))
+                                {
+                                    if(!en.goingDown)
+                                    {
+                                        en.goingDown = true;
+                                    }
+                                }
+                            }
+                        }
                         // en.velY += -1;  przyspiesza jak dluzej przytrzymasz
                         // en.setVelY(-1);
                         if(!en.jumping)
@@ -31,10 +48,22 @@ public class KeyInput implements KeyListener {
                             en.gravity = 9.0;
                         }
                         break;
-//                  case KeyEvent.VK_S:
-//                    //en.velY += 1;
-//                    en.setVelY(1);
-//                    break;
+                  case KeyEvent.VK_S:
+                    for(int j = 0; j<Game.handler.tile.size();j++)
+                    {
+                        Tile t = Game.handler.tile.get(j);
+                        if(t.getId() == Id.ladder)
+                        {
+                            if(en.getBoundsBottom().intersects(t.getBounds()))
+                            {
+                                if(!en.goingDown)
+                                {
+                                    en.goingDown = true;
+                                }
+                            }
+                        }
+                    }
+                    break;
                     case KeyEvent.VK_A:
                         // en.velX += -1;
                         en.setVelX(-1);
@@ -45,6 +74,10 @@ public class KeyInput implements KeyListener {
                         en.setVelX(1);
                         en.facing = 0;
                         break;
+                    case KeyEvent.VK_Q:
+                        en.die();
+                        break;
+
                 }
             }
 

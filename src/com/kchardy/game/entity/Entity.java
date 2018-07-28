@@ -2,21 +2,32 @@ package com.kchardy.game.entity;
 
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
+import com.kchardy.game.states.BossStade;
 
 import java.awt.*;
+
+import static com.kchardy.game.Game.deathScreen;
+import static com.kchardy.game.Game.gameOver;
+import static com.kchardy.game.Game.lives;
 
 public abstract class Entity {
 
     public int x, y;
+    public int velX, velY;
     public int width, height;
     public int facing = 0;  //0 - left, 1 - right
+    public int hp;
+    public int phaseTime;
+    public int type;
 
     public boolean jumping = false;
     public boolean falling = true;
+    public boolean goingDown = false;
+    public boolean attackable = false;
 
-    public int velX, velY;
 
     public Id id;
+    public BossStade bossStade;
 
     public double gravity = 0.0;
 
@@ -38,6 +49,15 @@ public abstract class Entity {
 
     public void die()
     {
+
+        if(getId()==Id.player)
+        {
+            lives --;
+            deathScreen = true;
+
+            if(lives <= 0)
+            gameOver = true;
+        }
         handler.removeEntity(this);
     }
 
@@ -54,6 +74,8 @@ public abstract class Entity {
         return id;
     }
 
+    public int getType() { return type; }
+
     public void setX(int x) {
         this.x = x;
     }
@@ -69,6 +91,11 @@ public abstract class Entity {
     public void setVelY(int velY) {
         this.velY = velY;
     }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
 
     public Rectangle getBounds()
     {

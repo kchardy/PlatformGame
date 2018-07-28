@@ -2,9 +2,10 @@ package com.kchardy.game;
 
 import com.kchardy.game.com.kchardy.game.graphics.Sprite;
 import com.kchardy.game.com.kchardy.game.graphics.SpriteSheet;
+import com.kchardy.game.com.kchardy.game.graphics.gui.Launcher;
 import com.kchardy.game.com.kchardy.game.input.KeyInput;
+import com.kchardy.game.com.kchardy.game.input.MouseInput;
 import com.kchardy.game.entity.Entity;
-import com.kchardy.game.entity.mob.Player;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,8 +16,8 @@ import java.io.IOException;
 
 public class Game extends Canvas implements Runnable{
 
-    public static final int WIDTH = 270;
-    public static final int HEIGHT = WIDTH/14*10;
+    public static final int WIDTH = 320;//270;
+    public static final int HEIGHT = 180;//WIDTH/14*10;
     public static final int SCALE = 3;//4
     public static final String TITLE = "Mag Eryk";
 
@@ -24,15 +25,30 @@ public class Game extends Canvas implements Runnable{
     private boolean running = false;
     private BufferedImage image;
 
+    public static int coins = 0;
+    public static int lives = 1;
+    public static int deathScreenTime = 0;
+
+    public static boolean deathScreen = true;
+    public static boolean gameOver = false;
+    public static boolean playing = false;
+
     public static Handler handler;
     public static SpriteSheet sheet;
+    public static Camera cam;
+    public static Launcher launcher;
+    public static MouseInput mouseInput;
+
     public static Sprite player[] = new Sprite[12];
     public static Sprite goblin[] = new Sprite[12];
+
     public static Sprite brick;
-    public static Sprite potion;
+    public static Sprite growPotion;
+    public static Sprite lifePotion;
     public static Sprite chest;
     public static Sprite openedChest;
-    public static Camera cam;
+    public static Sprite coin;
+
 
     public Game()
     {
@@ -47,13 +63,19 @@ public class Game extends Canvas implements Runnable{
         handler = new Handler();
         sheet = new SpriteSheet("/spritesheet2.png");
         cam = new Camera();
+        launcher = new Launcher();
+        mouseInput = new MouseInput();
 
         addKeyListener(new KeyInput());
+        addMouseMotionListener(mouseInput);
+        addMouseListener(mouseInput);
 
         brick = new Sprite(sheet ,1, 1);
-        potion = new Sprite(sheet,2, 1);
+        growPotion = new Sprite(sheet,2, 1);
+        lifePotion = new Sprite(sheet, 6,1);
         chest = new Sprite(sheet, 3, 1);
         openedChest = new Sprite(sheet, 4, 1);
+        coin = new Sprite(sheet, 5, 1);
 
 
         for(int i = 0; i < player.length; i++)
@@ -68,15 +90,16 @@ public class Game extends Canvas implements Runnable{
 
         try
         {
-            image = ImageIO.read(getClass().getResource("/level3.png"));
+            image = ImageIO.read(getClass().getResource("/level3.png"));//level3
         }
         catch(IOException e)
         {
             e.printStackTrace();
         }
-        handler.createLevel(image);
 
-        handler.addEntity(new Player(100, 500, 64, 64, Id.player, handler));
+   //     handler.createLevel(image);
+
+       // handler.addEntity(new Player(100, 500, 64, 64, Id.player, handler));//
     }
 
     private synchronized void start()
@@ -143,27 +166,71 @@ public class Game extends Canvas implements Runnable{
         Graphics g = bs.getDrawGraphics();
         g.setColor(Color.BLACK);
         g.fillRect(0,0, getWidth(), getHeight());
-        g.translate(cam.getX(), cam.getY());
-
-
-        handler.render(g);
-
-
+        if(!deathScreen)
+        {
+            g.drawImage(coin.getBufferedImage(),20,20, 75, 75, null);
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Courier", Font.BOLD, 20));
+            g.drawString("x" + coins, 100, 95);
+        }
+        if(deathScreen)
+        {
+            if(!gameOver)
+            {
+                g.drawImage(player[7].getBufferedImage(),(WIDTH*SCALE)/2,(HEIGHT*SCALE)/2, 75, 75, null);
+                g.setColor(Color.WHITE);
+                g.setFont(new Font("Georgia", Font.BOLD, 50));
+                g.drawString("x " + lives, (WIDTH*SCALE)/2 + 100, (HEIGHT*SCALE)/2 + 70);
+            }
+            else
+            {
+                g.setColor(Color.WHITE);
+                g.setFont(new Font("Georgia", Font.BOLD, 50));
+                g.drawString("GAME OVER", (WIDTH*SCALE)/2 + 100, (HEIGHT*SCALE)/2 + 70);
+            }
+        }
+        if(playing)
+            g.translate(cam.getX(), cam.getY());
+        if(!deathScreen && playing)
+            handler.render(g);
+        else if(!playing)
+            launcher.render(g);
         g.dispose();
         bs.show();
-
     }
 
     public void update()
     {
-        handler.tick();
+        if(playing)
+            handler.tick();
 
         for(Entity e:handler.entity)
         {
             if(e.getId() == Id.player)
             {
-                cam.tick(e);
+                if(!e.goingDown)
+                    cam.tick(e);
             }
+        }
+        if(deathScreen && !gameOver && playing)
+            deathScreenTime++;
+        if(deathScreenTime >= 180)
+        {
+            if(!gameOver)
+            {
+                deathScreen = false;
+                deathScreenTime = 0;
+                handler.clearLeve();
+                handler.createLevel(image);
+            }
+            else if(gameOver)
+            {
+                deathScreen = false;
+                deathScreenTime = 0;
+                playing = false;
+                gameOver = false;
+            }
+
         }
         render();
     }
@@ -176,6 +243,19 @@ public class Game extends Canvas implements Runnable{
     public static int getFrameHeight()
     {
         return HEIGHT*SCALE;
+    }
+
+    public static Rectangle getVisiableArea()
+    {
+        for(int i =0; i<handler.entity.size();i++)
+        {
+            Entity e = handler.entity.get(i);
+            if(e.getId() == Id.player)
+                return new Rectangle(e.getX() - (getFrameWidth()/2-5), e.getY() - (getFrameHeight()/2-5),
+                        getFrameWidth()+5, getFrameHeight()+5);
+
+        }
+        return null;
     }
 
     public static void main(String[] args) {

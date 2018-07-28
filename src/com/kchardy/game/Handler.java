@@ -1,11 +1,11 @@
 package com.kchardy.game;
 
+import com.kchardy.game.tile.Coin;
 import com.kchardy.game.entity.Entity;
 import com.kchardy.game.entity.mob.Goblin;
-import com.kchardy.game.entity.powerup.Potion;
-import com.kchardy.game.tile.Chest;
-import com.kchardy.game.tile.Tile;
-import com.kchardy.game.tile.Wall;
+import com.kchardy.game.entity.mob.Player;
+import com.kchardy.game.entity.mob.TowerBoss;
+import com.kchardy.game.tile.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,18 +18,21 @@ public class Handler {
 
     public Handler()
     {
-        //createLevel();
+
     }
 
     public void render(Graphics g)
     {
         for(Entity en: entity)
         {
-            en.render(g);
+            if(Game.getVisiableArea() != null && en.getBounds().intersects(Game.getVisiableArea()))
+                en.render(g);
         }
         for(Tile ti: tile)
         {
-            ti.render(g);
+            if(Game.getVisiableArea() != null && ti.getBounds().intersects(Game.getVisiableArea()))
+
+                ti.render(g);
         }
 
     }
@@ -39,11 +42,13 @@ public class Handler {
 
         for(Entity en: entity)
         {
-            en.tick();
+           // if(Game.getVisiableArea() != null && en.getBounds().intersects(Game.getVisiableArea()))
+                en.tick();
         }
         for(Tile ti: tile)
         {
-            ti.tick();
+            if(Game.getVisiableArea() != null && ti.getBounds().intersects(Game.getVisiableArea()))
+                ti.tick();
         }
     }
 
@@ -87,10 +92,20 @@ public class Handler {
                // if(red==0 && green==0 && blue==255)
                 //    addEntity(new Player(x*64, y*64, 64, 64,false, Id.player, this));
                 if(red==255 && green==0 && blue==0)
-                    addTile(new Chest(x*64, y*64, 64, 64, true,Id.chest, this, Game.potion));
-                   // addEntity(new Potion(x*64, y*64, 64, 64, Id.potion, this));
+                    addTile(new Chest(x*64, y*64, 64, 64, true,Id.chest, this, Game.lifePotion, 1));
+                   // addEntity(new Potion(x*64, y*64, 64, 64, Id.growPotion, this));
                 if(red==0 && green==255 && blue==0)
                     addEntity(new Goblin(x*64, y*64, 64, 64, Id.goblin, this));
+                if(red==0 && (green>123 && green < 129 ) && blue==0)
+                    addTile(new Ladder(x*64, y*64, 64, 64*15, true, Id.ladder, this, 128-green));
+                if(red==0 && green==0 && blue==255)
+                    addEntity(new Player(x*64, y*64, 48,48, Id.player, this));
+                if(red==255 && green==252 && blue==9)
+                    addTile(new Coin(x*64, y*64, 64, 64, true, Id.coin, this));
+                if(red==255 && green==0 && blue == 255)
+                    addEntity(new TowerBoss(x*64, y*64, 64, 64, Id.towerBoss, this, 3));
+
+
             }
         }
 //        for(int i = 0; i < Game.WIDTH*Game.SCALE/64+1; i++)
@@ -100,5 +115,10 @@ public class Handler {
 //                addTile(new Wall(i*64, 300, 64, 32, true, Id.wall, this)); // -64 zamiast 6
 //
 //        }
+    }
+    public void clearLeve()
+    {
+        entity.clear();
+        tile.clear();
     }
 }
