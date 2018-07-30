@@ -5,10 +5,12 @@ import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
 import com.kchardy.game.states.BossStade;
+import com.kchardy.game.states.LizardState;
 import com.kchardy.game.states.PlayerState;
 import com.kchardy.game.tile.Tile;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Player extends Entity {
 
@@ -17,18 +19,20 @@ public class Player extends Entity {
     private int frame = 0;
     private int frameDelay = 0;
     private int pixelsTravelled = 0;
+    private Random random;
 
     public Player(int x, int y, int width, int height, Id id, Handler handler) {
         super(x, y, width, height, id, handler);
 
         state = PlayerState.SMALL;
+        random = new Random();
     }
 
     @Override
     public void render(Graphics g) {
         if(facing == 0)
         {
-            g.drawImage(Game.player[frame+5].getBufferedImage(),x, y, width, height, null);//+5
+            g.drawImage(Game.player[frame+5].getBufferedImage(),x, y, width, height, null);
         }
         else if(facing == 1)
         {
@@ -101,7 +105,7 @@ public class Player extends Entity {
                         setVelX(0);
                         x = ti.getX() - ti.width;
                     }
-                    //dodane 
+                    //dodane
                     if(getBounds().intersects(ti.getBounds()) && ti.getId() == Id.coin)
                     {
                         Game.coins++;
@@ -178,15 +182,78 @@ public class Player extends Entity {
                         die();
                     }
                 }
-
-            }
-            else if(e.getId() == Id.coin)
-            {
-                if(getBounds().intersects(e.getBounds()) && e.getId() == Id.coin)
+                else if(e.getId() == Id.lizard)
                 {
-                    Game.coins ++;
-                    e.die();
+                    if(e.lizardState == LizardState.WALKING)
+                    {
+                        if(getBoundsBottom().intersects(e.getBoundsTop()))
+                        {
+                            e.lizardState = LizardState.ROLLED;
+
+                            jumping = true;
+                            falling = false;
+                            gravity = 3.5;
+                        }
+                        else if(getBounds().intersects(e.getBounds()))
+                        {
+                            die();
+                        }
+                    }
+                    else if(e.lizardState == LizardState.ROLLED)
+                    {
+                        if(getBoundsBottom().intersects(e.getBoundsTop()))
+                        {
+                            e.lizardState = LizardState.SPINNING;
+
+
+                            int direction = random.nextInt(2);
+
+                            switch (direction)
+                            {
+                                case 0:
+                                    e.setVelX(-5);
+                                    //facing = 0;
+                                    break;
+                                case 1:
+                                    e.setVelX(5);
+                                    //facing = 1;
+                                    break;
+                            }
+
+                            jumping = true;
+                            falling = false;
+                            gravity = 3.5;
+                        }
+
+                        if(getBoundsLeft().intersects(e.getBoundsRight()))
+                        {
+                            e.setVelX(-5);
+                            e.lizardState = LizardState.SPINNING;
+                        }
+                        if(getBoundsRight().intersects(e.getBoundsLeft()))
+                        {
+                            e.setVelX(5);
+                            e.lizardState = LizardState.SPINNING;
+                        }
+
+                    }
+                    else if(e.lizardState == LizardState.SPINNING)
+                    {
+                        if(getBoundsBottom().intersects(e.getBoundsTop()))
+                        {
+                            e.lizardState = LizardState.ROLLED;
+
+                            jumping = true;
+                            falling = false;
+                            gravity = 3.5;
+                        }
+                        else if(getBounds().intersects(e.getBounds()))
+                        {
+                            die();
+                        }
+                    }
                 }
+
             }
         }
         if(jumping && !goingDown)
@@ -238,7 +305,7 @@ public class Player extends Entity {
                                 pixelsTravelled+=velY;
                                 break;
                         }
-                        if(pixelsTravelled > t.height)
+                        if(pixelsTravelled > t.height * 2 + height)//dodane * 2 + height
                         {
                              goingDown = false;
                              pixelsTravelled = 0;

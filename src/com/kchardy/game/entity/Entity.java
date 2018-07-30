@@ -3,6 +3,7 @@ package com.kchardy.game.entity;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.states.BossStade;
+import com.kchardy.game.states.LizardState;
 
 import java.awt.*;
 
@@ -28,6 +29,7 @@ public abstract class Entity {
 
     public Id id;
     public BossStade bossStade;
+    public LizardState lizardState;
 
     public double gravity = 0.0;
 

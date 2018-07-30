@@ -25,6 +25,8 @@ public class Game extends Canvas implements Runnable{
     private boolean running = false;
     private BufferedImage image;
 
+    private static int playerX, playerY;
+
     public static int coins = 0;
     public static int lives = 1;
     public static int deathScreenTime = 0;
@@ -251,11 +253,16 @@ public class Game extends Canvas implements Runnable{
         {
             Entity e = handler.entity.get(i);
             if(e.getId() == Id.player)
-                return new Rectangle(e.getX() - (getFrameWidth()/2-5), e.getY() - (getFrameHeight()/2-5),
+            {
+                if(!e.goingDown)
+                playerX = e.getX();
+                playerY = e.getY();
+                return new Rectangle(playerX - (getFrameWidth()/2-5), playerY - (getFrameHeight()/2-5),
                         getFrameWidth()+5, getFrameHeight()+5);
-
+            }
         }
-        return null;
+        return new Rectangle(playerX - (getFrameWidth()/2-5), playerY - (getFrameHeight()/2-5),
+                getFrameWidth()+5, getFrameHeight()+5);
     }
 
     public static void main(String[] args) {

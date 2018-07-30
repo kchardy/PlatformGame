@@ -1,5 +1,6 @@
 package com.kchardy.game;
 
+import com.kchardy.game.entity.mob.Lizard;
 import com.kchardy.game.tile.Coin;
 import com.kchardy.game.entity.Entity;
 import com.kchardy.game.entity.mob.Goblin;
@@ -104,7 +105,8 @@ public class Handler {
                     addTile(new Coin(x*64, y*64, 64, 64, true, Id.coin, this));
                 if(red==255 && green==0 && blue == 255)
                     addEntity(new TowerBoss(x*64, y*64, 64, 64, Id.towerBoss, this, 3));
-
+                if(red==255 && green==100 && blue == 255)
+                    addEntity(new Lizard(x*64, y*64, 64, 64, Id.lizard, this));
 
             }
         }
