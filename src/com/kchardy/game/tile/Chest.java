@@ -5,6 +5,7 @@ import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.com.kchardy.game.graphics.Sprite;
 import com.kchardy.game.entity.powerup.Potion;
+import com.kchardy.game.entity.powerup.Staff;
 
 import java.awt.*;
 
@@ -40,7 +41,11 @@ public class Chest extends Tile {
             spriteY --;
             if(spriteY <=y - height)
             {
-                handler.addEntity(new Potion(x, spriteY, width, height, Id.potion, handler, type));
+                if(powerUp == Game.lifePotion || powerUp == Game.growPotion)
+                     handler.addEntity(new Potion(x, spriteY, width, height, Id.potion, handler, type));
+                else if(powerUp == Game.staff)
+                    handler.addEntity(new Staff(x, spriteY, width, height, Id.fireball, handler));
+
                 poppedUp = true;
 
             }

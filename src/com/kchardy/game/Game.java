@@ -1,5 +1,6 @@
 package com.kchardy.game;
 
+import com.kchardy.game.com.kchardy.game.Sound;
 import com.kchardy.game.com.kchardy.game.graphics.Sprite;
 import com.kchardy.game.com.kchardy.game.graphics.SpriteSheet;
 import com.kchardy.game.com.kchardy.game.graphics.gui.Launcher;
@@ -16,16 +17,19 @@ import java.io.IOException;
 
 public class Game extends Canvas implements Runnable{
 
-    public static final int WIDTH = 320;//270;
-    public static final int HEIGHT = 180;//WIDTH/14*10;
-    public static final int SCALE = 3;//4
+    public static final int WIDTH = 320;
+    public static final int HEIGHT = 180;
+    public static final int SCALE = 3;
     public static final String TITLE = "Mag Eryk";
 
     private Thread thread;
     private boolean running = false;
-    private BufferedImage image;
+
+    private static BufferedImage[] imageLevel;
+    private static BufferedImage background;
 
     private static int playerX, playerY;
+    private static int level = 0;
 
     public static int coins = 0;
     public static int lives = 1;
@@ -42,14 +46,26 @@ public class Game extends Canvas implements Runnable{
     public static MouseInput mouseInput;
 
     public static Sprite player[] = new Sprite[12];
+    public static Sprite playerStaff[] = new Sprite[12];
     public static Sprite goblin[] = new Sprite[12];
+    public static Sprite gate[] = new Sprite[4];
+    public static Sprite particle[] = new Sprite[6];
 
     public static Sprite brick;
     public static Sprite growPotion;
     public static Sprite lifePotion;
+    public static Sprite magicBean;
     public static Sprite chest;
     public static Sprite openedChest;
     public static Sprite coin;
+    public static Sprite fireball;
+    public static Sprite staff;
+
+    public static Sound jump;
+    public static Sound goombastomp;
+    public static Sound levelcomplite;
+    public static Sound losealife;
+    public static Sound themesong;
 
 
     public Game()
@@ -67,6 +83,7 @@ public class Game extends Canvas implements Runnable{
         cam = new Camera();
         launcher = new Launcher();
         mouseInput = new MouseInput();
+        imageLevel = new BufferedImage[2];
 
         addKeyListener(new KeyInput());
         addMouseMotionListener(mouseInput);
@@ -78,7 +95,7 @@ public class Game extends Canvas implements Runnable{
         chest = new Sprite(sheet, 3, 1);
         openedChest = new Sprite(sheet, 4, 1);
         coin = new Sprite(sheet, 5, 1);
-
+        magicBean = new Sprite(sheet,7,1);
 
         for(int i = 0; i < player.length; i++)
         {
@@ -90,16 +107,43 @@ public class Game extends Canvas implements Runnable{
             goblin[i] = new Sprite(sheet, i+1, 15);
         }
 
+        for(int i = 0; i < particle.length; i++)
+        {
+            particle[i] = new Sprite(sheet, i+1, 14);
+        }
+
+        for(int i = 0; i < playerStaff.length; i++)
+        {
+            playerStaff[i] = new Sprite(sheet, i+1, 13);
+        }
+        gate[0] = new Sprite(sheet, 1, 2);
+        gate[1] = new Sprite(sheet, 2, 3);
+        gate[2] = new Sprite(sheet, 1, 2);
+        gate[3] = new Sprite(sheet, 2, 3);
+
+
         try
         {
-            image = ImageIO.read(getClass().getResource("/level3.png"));//level3
+//            for (int i = 0;i<imageLevel.length;i++)
+//            {
+//                imageLevel[i] = ImageIO.read(getClass().getResource("/level" + level + ".png"));//level3
+//            }
+                imageLevel[0] = ImageIO.read(getClass().getResource("/level3.png" )); //"/level" + level + ".png"));//level3
+                imageLevel[1] = ImageIO.read(getClass().getResource("/level.png" )); //"/level" + level + ".png"));//level3
+            background = ImageIO.read(getClass().getResource("/background.jpg"));
         }
         catch(IOException e)
         {
             e.printStackTrace();
         }
 
-   //     handler.createLevel(image);
+     //   jump = new Sound("/jump.mp3"); zmienic na .wave lub "/audio/jump.wav
+//        jump = new Sound("/jump.mp3"); make this same for others
+//        jump = new Sound("/jump.mp3");
+//        jump = new Sound("/jump.mp3");
+//        jump = new Sound("/jump.mp3");
+
+   //     handler.createLevel(imageLevel);
 
        // handler.addEntity(new Player(100, 500, 64, 64, Id.player, handler));//
     }
@@ -166,14 +210,16 @@ public class Game extends Canvas implements Runnable{
             return;
         }
         Graphics g = bs.getDrawGraphics();
-        g.setColor(Color.BLACK);
+        g.setColor(Color.BLACK); //black background
         g.fillRect(0,0, getWidth(), getHeight());
         if(!deathScreen)
         {
-            g.drawImage(coin.getBufferedImage(),20,20, 75, 75, null);
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Courier", Font.BOLD, 20));
-            g.drawString("x" + coins, 100, 95);
+            g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
+
+//            g.drawImage(coin.getBufferedImage(),20,20, 75, 75, null);
+//            g.setColor(Color.WHITE);
+//            g.setFont(new Font("Courier", Font.BOLD, 20));
+//            g.drawString("x" + coins, 100, 95);
         }
         if(deathScreen)
         {
@@ -222,8 +268,10 @@ public class Game extends Canvas implements Runnable{
             {
                 deathScreen = false;
                 deathScreenTime = 0;
-                handler.clearLeve();
-                handler.createLevel(image);
+                handler.clearLevel();
+                handler.createLevel(imageLevel[level]);
+
+              //  themesong.play();
             }
             else if(gameOver)
             {
@@ -245,6 +293,16 @@ public class Game extends Canvas implements Runnable{
     public static int getFrameHeight()
     {
         return HEIGHT*SCALE;
+    }
+
+    public static void switchLevel()
+    {
+        level++;
+        handler.clearLevel();
+        handler.createLevel(imageLevel[level]);
+
+        themesong.close();
+        levelcomplite.play();
     }
 
     public static Rectangle getVisiableArea()

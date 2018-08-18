@@ -1,5 +1,6 @@
 package com.kchardy.game.entity;
 
+import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.states.BossStade;
@@ -51,6 +52,7 @@ public abstract class Entity {
 
     public void die()
     {
+        handler.removeEntity(this);
 
         if(getId()==Id.player)
         {
@@ -59,8 +61,9 @@ public abstract class Entity {
 
             if(lives <= 0)
             gameOver = true;
+//            Game.losealife.play();
         }
-        handler.removeEntity(this);
+//        handler.removeEntity(this);
     }
 
     public int getX() {

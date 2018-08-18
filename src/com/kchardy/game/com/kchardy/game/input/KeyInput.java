@@ -3,6 +3,7 @@ package com.kchardy.game.com.kchardy.game.input;
 import com.kchardy.game.Game;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
+import com.kchardy.game.entity.Fireball;
 import com.kchardy.game.tile.Tile;
 
 import java.awt.event.KeyEvent;
@@ -39,14 +40,20 @@ public class KeyInput implements KeyListener {
                                     }
                                 }
                             }
+                            else if(!en.jumping)
+                            {
+                                en.jumping = true;
+                                en.gravity = 9.0;
+                           //     Game.jump.play();
+                            }
                         }
                         // en.velY += -1;  przyspiesza jak dluzej przytrzymasz
                         // en.setVelY(-1);
-                        if(!en.jumping)
-                        {
-                            en.jumping = true;
-                            en.gravity = 9.0;
-                        }
+//                        if(!en.jumping)
+//                        {
+//                            en.jumping = true;
+//                            en.gravity = 9.0;
+//                        }
                         break;
                   case KeyEvent.VK_S:
                     for(int j = 0; j<Game.handler.tile.size();j++)
@@ -76,6 +83,16 @@ public class KeyInput implements KeyListener {
                         break;
                     case KeyEvent.VK_Q:
                         en.die();
+                        break;
+                    case KeyEvent.VK_SPACE:
+                        switch (en.facing)
+                        {
+                            case 0:
+                                Game.handler.addEntity(new Fireball(en.getX()-24, en.getY()-24));
+                                break;
+                            case 1:
+                                break;
+                        }
                         break;
 
                 }

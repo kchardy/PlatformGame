@@ -1,6 +1,7 @@
 package com.kchardy.game;
 
 import com.kchardy.game.entity.mob.Lizard;
+import com.kchardy.game.entity.powerup.Bean;
 import com.kchardy.game.tile.Coin;
 import com.kchardy.game.entity.Entity;
 import com.kchardy.game.entity.mob.Goblin;
@@ -11,6 +12,9 @@ import com.kchardy.game.tile.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
+
+import static com.kchardy.game.Game.coin;
+import static com.kchardy.game.Game.coins;
 
 public class Handler {
 
@@ -24,18 +28,28 @@ public class Handler {
 
     public void render(Graphics g)
     {
-        for(Entity en: entity)
-        {
-            if(Game.getVisiableArea() != null && en.getBounds().intersects(Game.getVisiableArea()))
-                en.render(g);
-        }
-        for(Tile ti: tile)
-        {
-            if(Game.getVisiableArea() != null && ti.getBounds().intersects(Game.getVisiableArea()))
 
-                ti.render(g);
+        for(Entity e: entity)
+        {
+            if(e.getId()!=Id.particle &&Game.getVisiableArea() != null && e.getBounds().intersects(Game.getVisiableArea()))
+                e.render(g);
+        }
+        for(Tile t: tile)
+        {
+            if(Game.getVisiableArea() != null && t.getBounds().intersects(Game.getVisiableArea()))
+
+                t.render(g);
+        }
+        for(Entity e: entity)
+        {
+            if(e.getId()==Id.particle &&Game.getVisiableArea() != null && e.getBounds().intersects(Game.getVisiableArea()))
+                e.render(g);
         }
 
+        g.drawImage(coin.getBufferedImage(),Game.getVisiableArea().x +20,Game.getVisiableArea().y+20, 75, 75, null);
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Courier", Font.BOLD, 20));
+        g.drawString("x" + coins, Game.getVisiableArea().x+100, Game.getVisiableArea().y+95);
     }
 
     public void tick()
@@ -90,23 +104,36 @@ public class Handler {
 
                 if(red==0 && green==0 && blue==0)
                     addTile(new Wall(x*64, y*64, 64, 64,true, Id.wall, this));//64
-               // if(red==0 && green==0 && blue==255)
-                //    addEntity(new Player(x*64, y*64, 64, 64,false, Id.player, this));
+
                 if(red==255 && green==0 && blue==0)
                     addTile(new Chest(x*64, y*64, 64, 64, true,Id.chest, this, Game.lifePotion, 1));
-                   // addEntity(new Potion(x*64, y*64, 64, 64, Id.growPotion, this));
+
+                if(red==255 && green==10 && blue==0)
+                    addTile(new Chest(x*64, y*64, 64, 64, true,Id.chest, this, Game.staff, 1));
+
                 if(red==0 && green==255 && blue==0)
                     addEntity(new Goblin(x*64, y*64, 64, 64, Id.goblin, this));
+
                 if(red==0 && (green>123 && green < 129 ) && blue==0)
-                    addTile(new Ladder(x*64, y*64, 64, 64*15, true, Id.ladder, this, 128-green));
+                    addTile(new Ladder(x*64, y*64, 64, 64*15, true, Id.ladder, this, 128-green, true));
+
                 if(red==0 && green==0 && blue==255)
                     addEntity(new Player(x*64, y*64, 48,48, Id.player, this));
+
                 if(red==255 && green==252 && blue==9)
                     addTile(new Coin(x*64, y*64, 64, 64, true, Id.coin, this));
+
                 if(red==255 && green==0 && blue == 255)
                     addEntity(new TowerBoss(x*64, y*64, 64, 64, Id.towerBoss, this, 3));
+
                 if(red==255 && green==100 && blue == 255)
                     addEntity(new Lizard(x*64, y*64, 64, 64, Id.lizard, this));
+
+                if(red==75 && green==0 && blue==0)
+                    addTile(new Gate(x*64, y*64, 64, 64*5, true, Id.gate, this));
+
+                if(red==111 && green==111 && blue == 111)
+                    addEntity(new Bean(x*64, y*64, 64, 64, Id.bean, this));
 
             }
         }
@@ -118,7 +145,7 @@ public class Handler {
 //
 //        }
     }
-    public void clearLeve()
+    public void clearLevel()
     {
         entity.clear();
         tile.clear();
