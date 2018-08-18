@@ -4,6 +4,8 @@ import com.kchardy.game.Game;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
 import com.kchardy.game.entity.Fireball;
+import com.kchardy.game.entity.mob.Player;
+import com.kchardy.game.states.PlayerState;
 import com.kchardy.game.tile.Tile;
 
 import java.awt.event.KeyEvent;
@@ -85,12 +87,14 @@ public class KeyInput implements KeyListener {
                         en.die();
                         break;
                     case KeyEvent.VK_SPACE:
+                        if(en.state == PlayerState.FIRE)
                         switch (en.facing)
                         {
                             case 0:
-                                Game.handler.addEntity(new Fireball(en.getX()-24, en.getY()-24));
+                                Game.handler.addEntity(new Fireball(en.getX()-24, en.getY()+12, 24, 24, Id.fireball, Game.handler, en.facing));
                                 break;
                             case 1:
+                                Game.handler.addEntity(new Fireball(en.getX()+ en.width, en.getY()+12, 24, 24, Id.fireball, Game.handler, en.facing));
                                 break;
                         }
                         break;

@@ -16,7 +16,6 @@ import java.util.Random;
 
 public class Player extends Entity {
 
-    private PlayerState state;
 
     private int frame = 0;
     private int frameDelay = 0;

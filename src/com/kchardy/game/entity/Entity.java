@@ -5,6 +5,7 @@ import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.states.BossStade;
 import com.kchardy.game.states.LizardState;
+import com.kchardy.game.states.PlayerState;
 
 import java.awt.*;
 
@@ -21,6 +22,9 @@ public abstract class Entity {
     public int hp;
     public int phaseTime;
     public int type;
+
+    public static PlayerState state;
+
 
     public boolean jumping = false;
     public boolean falling = true;

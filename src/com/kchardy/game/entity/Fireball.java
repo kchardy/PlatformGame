@@ -81,7 +81,7 @@ public class Fireball extends Entity {
 
         }
         if (falling) {
-            gravity += 0.15;//0,17
+            gravity += 0.15;//0,17//0,4 faster
             setVelY((int) gravity);
         }
     }
