@@ -22,9 +22,11 @@ public class Player extends Entity {
     private int pixelsTravelled = 0;
     private int invincibilityTime = 0;
     private int particleDelay = 0;
+    private int restoreTime = 0;
 
     private Random random;
     private boolean invincible = false;
+    private boolean restoring;
 
     public Player(int x, int y, int width, int height, Id id, Handler handler) {
         super(x, y, width, height, id, handler);
@@ -57,6 +59,8 @@ public class Player extends Entity {
     public void tick() {
         x += velX;
         y += velY;
+
+        if(getY()>Game.deathY)die();
 
         if(invincible)
         {
@@ -91,6 +95,16 @@ public class Player extends Entity {
                 setVelX(1);
             else if(velX == -5)
                 setVelX(-1);
+        }
+
+        if(restoring)
+        {
+            restoreTime++;
+            if(restoreTime>=90)
+            {
+                restoring=false;
+                restoreTime=0;
+            }
         }
 //        if(x <= 0)
 //            x = 0;
@@ -206,15 +220,12 @@ public class Player extends Entity {
                             gravity = 3.5;
                         }
                     } else if (getBounds().intersects(e.getBounds())) {
-                        if (state == PlayerState.BIG) {
-                            state = PlayerState.SMALL;
-                            width /= 3;
-                            height /= 3;
-                            x += width;
-                            y += height;
-                        } else if (state == PlayerState.SMALL) {
-                            die();
+                        if (state == PlayerState.BIG){
+                            damage();
                         }
+// else if (state == PlayerState.SMALL) {
+//                            damage();
+//                        }
                     }
 
                     else if (e.getId() == Id.lizard) {
@@ -229,7 +240,7 @@ public class Player extends Entity {
                                     falling = false;
                                     gravity = 3.5;
                                 } else if (getBounds().intersects(e.getBounds())) {
-                                    die();
+                                    damage();
                                 }
                             } else if (e.lizardState == LizardState.ROLLED) {
                                 if (getBoundsBottom().intersects(e.getBoundsTop())) {
@@ -268,7 +279,7 @@ public class Player extends Entity {
                                     falling = false;
                                     gravity = 3.5;
                                 } else if (getBounds().intersects(e.getBounds())) {
-                                    die();
+                                    damage();
                                 }
                             }
                         }
@@ -350,6 +361,37 @@ public class Player extends Entity {
                     }
                 }
             }
+        }
+        public void damage()
+        {
+            if(restoring) return;;
+             if (state == PlayerState.SMALL)
+             {
+                 die();
+                 return;
+             }
+             else if(state == PlayerState.BIG)
+             {
+                 width-=(width/4);
+                 height-=(height/4);
+                 x+=width/4;
+                 y+=height/4;
+
+                 state = PlayerState.SMALL;
+             //    Game.damage.play();
+                 restoring = true;
+                 restoreTime = 0;
+                return;
+             }
+             else if(state == PlayerState.FIRE)
+             {
+                 state = PlayerState.BIG;
+                 //    Game.damage.play();
+                 restoring = true;
+                 restoreTime = 0;
+
+                 return;
+             }
         }
     }
 

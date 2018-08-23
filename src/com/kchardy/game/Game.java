@@ -7,6 +7,7 @@ import com.kchardy.game.com.kchardy.game.graphics.gui.Launcher;
 import com.kchardy.game.com.kchardy.game.input.KeyInput;
 import com.kchardy.game.com.kchardy.game.input.MouseInput;
 import com.kchardy.game.entity.Entity;
+import com.kchardy.game.tile.Tile;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,6 +15,9 @@ import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 
 public class Game extends Canvas implements Runnable{
 
@@ -32,8 +36,9 @@ public class Game extends Canvas implements Runnable{
     private static int level = 0;
 
     public static int coins = 0;
-    public static int lives = 1;
+    public static int lives = 5;
     public static int deathScreenTime = 0;
+    public static int deathY = 0;
 
     public static boolean deathScreen = true;
     public static boolean gameOver = false;
@@ -47,9 +52,11 @@ public class Game extends Canvas implements Runnable{
 
     public static Sprite player[] = new Sprite[12];
     public static Sprite playerStaff[] = new Sprite[12];
-    public static Sprite goblin[] = new Sprite[12];
-    public static Sprite gate[] = new Sprite[4];
+    public static Sprite goblin[] = new Sprite[10];
     public static Sprite particle[] = new Sprite[6];
+//    public static Sprite fireball[] = new Sprite[3];
+    public static Sprite fireball;
+
 
     public static Sprite brick;
     public static Sprite growPotion;
@@ -58,8 +65,9 @@ public class Game extends Canvas implements Runnable{
     public static Sprite chest;
     public static Sprite openedChest;
     public static Sprite coin;
-    public static Sprite fireball;
     public static Sprite staff;
+    public static Sprite gate;
+
 
     public static Sound jump;
     public static Sound goombastomp;
@@ -91,11 +99,13 @@ public class Game extends Canvas implements Runnable{
 
         brick = new Sprite(sheet ,1, 1);
         growPotion = new Sprite(sheet,2, 1);
-        lifePotion = new Sprite(sheet, 6,1);
         chest = new Sprite(sheet, 3, 1);
         openedChest = new Sprite(sheet, 4, 1);
         coin = new Sprite(sheet, 5, 1);
-        magicBean = new Sprite(sheet,7,1);
+        lifePotion = new Sprite(sheet, 6,1);
+        gate = new Sprite(sheet,7,1 );
+        magicBean = new Sprite(sheet,8,1);
+            fireball = new Sprite(sheet, 1, 12);
 
         for(int i = 0; i < player.length; i++)
         {
@@ -107,19 +117,21 @@ public class Game extends Canvas implements Runnable{
             goblin[i] = new Sprite(sheet, i+1, 15);
         }
 
-        for(int i = 0; i < particle.length; i++)
-        {
-            particle[i] = new Sprite(sheet, i+1, 14);
-        }
-
         for(int i = 0; i < playerStaff.length; i++)
         {
-            playerStaff[i] = new Sprite(sheet, i+1, 13);
+            playerStaff[i] = new Sprite(sheet, i+1, 14);
         }
-        gate[0] = new Sprite(sheet, 1, 2);
-        gate[1] = new Sprite(sheet, 2, 3);
-        gate[2] = new Sprite(sheet, 1, 2);
-        gate[3] = new Sprite(sheet, 2, 3);
+
+        for(int i = 0; i < particle.length; i++)
+        {
+            particle[i] = new Sprite(sheet, i+1, 13);
+        }
+
+//        for(int i = 0; i < fireball.length; i++)
+//        {
+//            fireball[i] = new Sprite(sheet, i+1, 12);
+//        }
+
 
 
         try
@@ -128,8 +140,8 @@ public class Game extends Canvas implements Runnable{
 //            {
 //                imageLevel[i] = ImageIO.read(getClass().getResource("/level" + level + ".png"));//level3
 //            }
-                imageLevel[0] = ImageIO.read(getClass().getResource("/level3.png" )); //"/level" + level + ".png"));//level3
-                imageLevel[1] = ImageIO.read(getClass().getResource("/level.png" )); //"/level" + level + ".png"));//level3
+                imageLevel[1] = ImageIO.read(getClass().getResource("/level3.png" )); //"/level" + level + ".png"));//level3
+                imageLevel[0] = ImageIO.read(getClass().getResource("/level0.png" )); //"/level" + level + ".png"));//level3
             background = ImageIO.read(getClass().getResource("/background.jpg"));
         }
         catch(IOException e)
@@ -321,6 +333,22 @@ public class Game extends Canvas implements Runnable{
         }
         return new Rectangle(playerX - (getFrameWidth()/2-5), playerY - (getFrameHeight()/2-5),
                 getFrameWidth()+5, getFrameHeight()+5);
+    }
+
+    public static int getDeathY()
+    {
+        LinkedList<Tile> tempList = handler.tile;
+
+        Comparator <Tile> tileSorier = new Comparator<Tile>() {
+            @Override
+            public int compare(Tile t1, Tile t2) {
+                if(t1.getY()>t2.getY()) return -1;
+                if(t1.getY()<t2.getY()) return 1;
+                return 0;
+            }
+        };
+        Collections.sort(tempList,tileSorier);
+        return tempList.getFirst().getY() + tempList.getFirst().height;
     }
 
     public static void main(String[] args) {

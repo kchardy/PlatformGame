@@ -40,11 +40,11 @@ public class Goblin extends Entity {
     public void render(Graphics g) {
         if(facing == 0)
         {
-            g.drawImage(Game.goblin[frame+5].getBufferedImage(),x, y, width, height, null);//+5
+            g.drawImage(Game.goblin[frame].getBufferedImage(),x, y, width, height, null);//+5
         }
         else if(facing == 1)
         {
-            g.drawImage(Game.goblin[frame].getBufferedImage(),x, y, width, height, null);
+            g.drawImage(Game.goblin[frame+5].getBufferedImage(),x, y, width, height, null);
         }
     }
 
@@ -88,10 +88,10 @@ public class Goblin extends Entity {
         if(velX!=0)
         {
             frameDelay++;
-            if(frameDelay >= 3)
+            if(frameDelay >= 5)
             {
                 frame++;
-                if(frame >= 6)//5
+                if(frame >= 3)//5
                     frame = 0;//0
                 frameDelay = 0;
             }

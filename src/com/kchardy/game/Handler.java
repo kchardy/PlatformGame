@@ -137,6 +137,7 @@ public class Handler {
 
             }
         }
+        Game.deathY = Game.getDeathY();
 //        for(int i = 0; i < Game.WIDTH*Game.SCALE/64+1; i++)
 //        {
 //            addTile(new Wall(i*64, Game.HEIGHT*Game.SCALE - 6, 64, 64, true, Id.wall, this)); // -64 zamiast 6

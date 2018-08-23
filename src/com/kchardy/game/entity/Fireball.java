@@ -7,7 +7,12 @@ import com.kchardy.game.tile.Tile;
 
 import java.awt.*;
 
+
 public class Fireball extends Entity {
+
+    private int frame = 0;
+
+
     public Fireball(int x, int y, int width, int height, Id id, Handler handler, int facing) {
         super(x, y, width, height, id, handler);
 
@@ -25,6 +30,15 @@ public class Fireball extends Entity {
     @Override
     public void render(Graphics g) {
         g.drawImage(Game.fireball.getBufferedImage(), getX(), getY(), width, height, null);
+
+//        if(facing == 0)
+//        {
+//            g.drawImage(Game.fireball[frame+5].getBufferedImage(),x, y, width, height, null);//+5
+//        }
+//        else if(facing == 1)
+//        {
+//            g.drawImage(Game.fireball[frame].getBufferedImage(),x, y, width, height, null);
+//        }
     }
 
     @Override

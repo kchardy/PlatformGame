@@ -13,10 +13,7 @@ public class Gate extends Tile {
 
     @Override
     public void render(Graphics g) {
-        g.drawImage(Game.gate[0].getBufferedImage(), getX(), getY()+height-64, width, 64, null);
-        g.drawImage(Game.gate[1].getBufferedImage(), getX()+64, getY()+64, width, 64, null);
-        g.drawImage(Game.gate[2].getBufferedImage(), getX(), getY(), width, 64, null);
-        g.drawImage(Game.gate[3].getBufferedImage(), getX()+64, getY()+ 192, width, 64, null);
+        g.drawImage(Game.gate.getBufferedImage(), getX(), getY(), 128, 128, null);
     }
 
     @Override

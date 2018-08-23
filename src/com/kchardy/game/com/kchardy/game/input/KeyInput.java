@@ -12,6 +12,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyInput implements KeyListener {
+
+    private boolean fire;
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -87,14 +89,16 @@ public class KeyInput implements KeyListener {
                         en.die();
                         break;
                     case KeyEvent.VK_SPACE:
-                        if(en.state == PlayerState.FIRE)
+                        if(en.state == PlayerState.FIRE && !fire)
                         switch (en.facing)
                         {
                             case 0:
                                 Game.handler.addEntity(new Fireball(en.getX()-24, en.getY()+12, 24, 24, Id.fireball, Game.handler, en.facing));
+                                fire = true;
                                 break;
                             case 1:
                                 Game.handler.addEntity(new Fireball(en.getX()+ en.width, en.getY()+12, 24, 24, Id.fireball, Game.handler, en.facing));
+                                fire = true;
                                 break;
                         }
                         break;
@@ -127,6 +131,9 @@ public class KeyInput implements KeyListener {
                         break;
                     case KeyEvent.VK_D:
                         en.setVelX(0);
+                        break;
+                    case KeyEvent.VK_SPACE:
+                        fire = false;
                         break;
                 }
             }
