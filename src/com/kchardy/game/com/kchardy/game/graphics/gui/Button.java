@@ -77,9 +77,4 @@ public class Button {
     public String getLabel() {
         return label;
     }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
 }

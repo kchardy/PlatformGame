@@ -1,5 +1,6 @@
 package com.kchardy.game.entity.mob;
 
+import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
@@ -40,8 +41,24 @@ public class Lizard extends Entity {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillRect(getX(), getY(), width, height);
+        if(facing == 0 && lizardState == LizardState.WALKING || lizardState == LizardState.SPINNING)
+        {
+            g.drawImage(Game.lizard[frame].getBufferedImage(),x, y, width, height, null);//+5
+        }
+        else if(facing == 1 && lizardState == LizardState.WALKING || lizardState == LizardState.SPINNING)
+        {
+            g.drawImage(Game.lizard[frame+3].getBufferedImage(),x, y, width, height, null);
+        }
+        else if(facing == 0 && lizardState == LizardState.ROLLED)
+        {
+            g.drawImage(Game.lizardRolling[frame].getBufferedImage(),x, y, width, height, null);//+5
+        }
+        else if(facing == 1 && lizardState == LizardState.ROLLED)
+        {
+            g.drawImage(Game.lizardRolling[frame+3].getBufferedImage(),x, y, width, height, null);
+        }
+
+
     }
 
     @Override
@@ -69,11 +86,9 @@ public class Lizard extends Entity {
                     {
                         case 0:
                             setVelX(-1);
-                          //  facing = 0;
                             break;
                         case 1:
                             setVelX(1);
-                         //   facing = 1;
                             break;
                     }
                 }
@@ -96,15 +111,12 @@ public class Lizard extends Entity {
                         setVelX(5);
                     else
                         setVelX(2);
-                   // facing = 1;
                 }
                 if (getBoundsRight().intersects(ti.getBounds())) {
                     if(lizardState == LizardState.SPINNING)
                         setVelX(-5);
                     else
                         setVelX(-2);
-
-                    // facing = 0;
                 }
             }
         }
@@ -114,18 +126,17 @@ public class Lizard extends Entity {
             setVelY((int) gravity);
         }
 
-        //animacja
-//        if(velX!=0)
-//        {
-//            frameDelay++;
-//            if(frameDelay >= 3)
-//            {
-//                frame++;
-//                if(frame >= 6)//5
-//                    frame = 0;//0
-//                frameDelay = 0;
-//            }
-//        }
+        if(velX!=0)
+        {
+            frameDelay++;
+            if(frameDelay >= 3)
+            {
+                frame++;
+                if(frame >= 4)
+                    frame = 0;//0
+                frameDelay = 0;
+            }
+        }
 
     }
 }

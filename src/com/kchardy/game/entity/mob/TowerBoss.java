@@ -3,7 +3,7 @@ package com.kchardy.game.entity.mob;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
-import com.kchardy.game.states.BossStade;
+import com.kchardy.game.states.BossState;
 import com.kchardy.game.tile.Tile;
 
 import java.awt.*;
@@ -20,18 +20,18 @@ public class TowerBoss extends Entity {
         super(x, y, width, height, id, handler);
         this.hp = hp;
 
-        bossStade = BossStade.IDLE;
+        bossStade = BossState.IDLE;
 
         random = new Random();
     }
 
     @Override
     public void render(Graphics g) {
-        if(bossStade == BossStade.IDLE || bossStade == BossStade.SPINNING)
+        if(bossStade == BossState.IDLE || bossStade == BossState.SPINNING)
             g.setColor(Color.MAGENTA);
-        else if(bossStade == BossStade.RECOVERING)
+        else if(bossStade == BossState.RECOVERING)
             g.setColor(Color.RED);
-        else if(bossStade == BossStade.RUNNING || bossStade == BossStade.JUMPING)
+        else if(bossStade == BossState.RUNNING || bossStade == BossState.JUMPING)
             g.setColor(Color.YELLOW);
 
         g.fillRect(x, y, width, height);
@@ -49,31 +49,31 @@ public class TowerBoss extends Entity {
 
         phaseTime++;
 
-        if((phaseTime>=180 && bossStade == BossStade.IDLE) || phaseTime>=600 && bossStade != BossStade.SPINNING)
+        if((phaseTime>=180 && bossStade == BossState.IDLE) || phaseTime>=600 && bossStade != BossState.SPINNING)
             chooseState();
 
-        if(bossStade == BossStade.RECOVERING && phaseTime >= 180)
+        if(bossStade == BossState.RECOVERING && phaseTime >= 180)
         {
-            bossStade = BossStade.SPINNING;
+            bossStade = BossState.SPINNING;
             phaseTime = 0;
         }
 
-        if(phaseTime>=360 && bossStade == BossStade.SPINNING)
+        if(phaseTime>=360 && bossStade == BossState.SPINNING)
         {
             phaseTime = 0;
-            bossStade = BossStade.IDLE;
+            bossStade = BossState.IDLE;
         }
-        if(bossStade == BossStade.IDLE || bossStade == BossStade.RECOVERING)
+        if(bossStade == BossState.IDLE || bossStade == BossState.RECOVERING)
         {
             setVelX(0);
             setVelY(0);
         }
-        if(bossStade == BossStade.RUNNING || bossStade == BossStade.JUMPING)
+        if(bossStade == BossState.RUNNING || bossStade == BossState.JUMPING)
             attackable = true;
         else
             attackable = false;
 
-        if(bossStade != BossStade.JUMPING)
+        if(bossStade != BossState.JUMPING)
         {
             addJumpTime = false;
             jumpTime = 0;
@@ -118,7 +118,7 @@ public class TowerBoss extends Entity {
                 if (getBoundsLeft().intersects(t.getBounds()))
                 {
                     setVelX(0);
-                    if(bossStade == BossStade.RUNNING)
+                    if(bossStade == BossState.RUNNING)
                     {
                         setVelX(4);
                     }
@@ -127,7 +127,7 @@ public class TowerBoss extends Entity {
                 if (getBoundsRight().intersects(t.getBounds()))
                 {
                     setVelX(0);
-                    if(bossStade == BossStade.RUNNING)
+                    if(bossStade == BossState.RUNNING)
                     {
                         setVelX(-4);
                     }
@@ -140,7 +140,7 @@ public class TowerBoss extends Entity {
                 Entity e = handler.entity.get(i);
                 if(e.getId() == Id.player)
                 {
-                    if(bossStade == BossStade.JUMPING)
+                    if(bossStade == BossState.JUMPING)
                     {
                         if(jumping || falling)
                         {
@@ -156,7 +156,7 @@ public class TowerBoss extends Entity {
                             setVelX(0);
                         }
                     }
-                    else if(bossStade == BossStade.SPINNING)
+                    else if(bossStade == BossState.SPINNING)
                     {
                         if(e.getX() < getX())
                              setVelX(-3);
@@ -168,9 +168,9 @@ public class TowerBoss extends Entity {
             }
         if(jumping)
         {
-            gravity -= 0.1;//0,15
+            gravity -= 0.1;
             setVelY((int) -gravity);
-            if(gravity <= 0.0)//0,6
+            if(gravity <= 0.0)
             {
                 jumping = false;
                 falling = true;
@@ -179,7 +179,7 @@ public class TowerBoss extends Entity {
         }
         if(falling)
         {
-            gravity += 0.1;//0,15
+            gravity += 0.1;
             setVelY((int) gravity);
         }
 
@@ -189,7 +189,7 @@ public class TowerBoss extends Entity {
         int nextPhase = random.nextInt(2);
         if(nextPhase == 0)
         {
-            bossStade = BossStade.RUNNING;
+            bossStade = BossState.RUNNING;
             int direction = random.nextInt(2);
             if(direction == 0)
                 setVelX(-4);
@@ -198,7 +198,7 @@ public class TowerBoss extends Entity {
         }
         else if(nextPhase == 1)
         {
-            bossStade = BossStade.JUMPING;
+            bossStade = BossState.JUMPING;
             jumping = true;
             gravity = 8.0;
         }

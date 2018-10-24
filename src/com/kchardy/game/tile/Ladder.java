@@ -14,7 +14,7 @@ public class Ladder extends Tile {
 
         if(trap)
         {
-            handler.addEntity(new Trap(getX(), getY()+64, width, 64, Id.trap, handler));//-64?
+            handler.addEntity(new Trap(getX(), getY()+64, width, 64, Id.trap, handler));
         }
     }
 

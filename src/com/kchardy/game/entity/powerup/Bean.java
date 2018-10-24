@@ -61,14 +61,13 @@ public class Bean extends Entity {
                 }
                 if(getBoundsRight().intersects(t.getBounds()))
                     setVelX(-1);
-
             }
         }
         if(jumping)
         {
-            gravity -= 0.17;//0,15
+            gravity -= 0.17;
             setVelY((int) -gravity);
-            if(gravity <= 0.0)//0,6
+            if(gravity <= 0.0)
             {
                 jumping = false;
                 falling = true;
@@ -76,7 +75,7 @@ public class Bean extends Entity {
         }
         if(falling)
         {
-            gravity += 0.17;//0,15
+            gravity += 0.17;
             setVelY((int) gravity);
         }
     }

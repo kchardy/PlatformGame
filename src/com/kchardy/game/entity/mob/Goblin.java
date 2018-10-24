@@ -4,6 +4,7 @@ import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
+import com.kchardy.game.states.GoblinState;
 import com.kchardy.game.tile.Tile;
 
 import java.awt.*;
@@ -17,8 +18,12 @@ public class Goblin extends Entity {
     private int frame = 0;
     private int frameDelay = 0;
 
+    public static GoblinState stade;
+
+
     public Goblin(int x, int y, int width, int height, Id id, Handler handler) {
         super(x, y, width, height, id, handler);
+        stade = GoblinState.ALIVE;
 
         int direction = random.nextInt(2);
 
@@ -35,12 +40,11 @@ public class Goblin extends Entity {
         }
     }
 
-
     @Override
     public void render(Graphics g) {
         if(facing == 0)
         {
-            g.drawImage(Game.goblin[frame].getBufferedImage(),x, y, width, height, null);//+5
+            g.drawImage(Game.goblin[frame].getBufferedImage(),x, y, width, height, null);
         }
         else if(facing == 1)
         {
@@ -91,12 +95,11 @@ public class Goblin extends Entity {
             if(frameDelay >= 5)
             {
                 frame++;
-                if(frame >= 3)//5
-                    frame = 0;//0
+                if(frame >= 3)
+                    frame = 0;
                 frameDelay = 0;
             }
         }
     }
-
 }
 

@@ -5,9 +5,12 @@ import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 import com.kchardy.game.entity.Entity;
 import com.kchardy.game.entity.Particle;
-import com.kchardy.game.states.BossStade;
+import com.kchardy.game.states.BossState;
+import com.kchardy.game.states.GoblinState;
 import com.kchardy.game.states.LizardState;
 import com.kchardy.game.states.PlayerState;
+import com.kchardy.game.tile.Chest;
+import com.kchardy.game.tile.Gate;
 import com.kchardy.game.tile.Tile;
 import com.kchardy.game.tile.Trail;
 
@@ -77,21 +80,20 @@ public class Player extends Entity {
             }
 
             invincibilityTime++;
-            if(invincibilityTime>=600)//~10 sec
+            if(invincibilityTime>=600)
             {
                 invincible=false;
                 invincibilityTime=0;
             }
 
-            //speed incresing
-            if(velX == 1) //1 normal walking for a player
+            if(velX == 1)
                 setVelX(5);
             else if(velX == -1)
                 setVelX(-5);
         }
         else
         {
-            if(velX == 5) //1 normal walking for a player
+            if(velX == 5)
                 setVelX(1);
             else if(velX == -5)
                 setVelX(-1);
@@ -106,67 +108,61 @@ public class Player extends Entity {
                 restoreTime=0;
             }
         }
-//        if(x <= 0)
-//            x = 0;
-//        if(y <= 0)
-//            y = 0;
-//        if(x+width >= 810)//(width/14*10*3)) //WIDTH/14*10*SCALE        // prze SCALE = 4 ->1080
-//            x = 810 - width;
-//        if(y+height >= 578)//(width/14*10*3)) //WIDTH/14*10*SCALE        // prze SCALE = 4 ->771
-//            y = 578 - height;
 
-        //----------------
-//        if(velX!=0)
-//            animate = true;
-//        else animate = false;
-
-//        if(goingDown)
-//        {
-//            pixelsTravelled += velY;
-//        }
-
-        // for(Tile ti : handler.tile)
         for (int i = 0; i < handler.tile.size(); i++) {
             Tile ti = handler.tile.get(i);
-            if (ti.isSolid() && !goingDown) { ///dodane
-                //  if (ti.getId() == Id.wall) //nie bylo
-                // {
-                if (getBoundsTop().intersects(ti.getBounds()) && ti.getId() != Id.coin) {
+            if (ti.isSolid() && !goingDown) {
+                if (getBoundsTop().intersects(ti.getBounds()) && ti.getId() != Id.coin) { //top
                     setVelY(0);
                     if (jumping && !goingDown) {
                         jumping = false;
                         gravity = 0.8;
                         falling = true;
                     }
-                    if (ti.getId() == Id.chest) {
-                        if (getBounds().intersects(ti.getBounds()))
+                }
+                if (getBounds().intersects(ti.getBounds())) {
+                    if (ti.getId() == Id.gate && Gate.isVisible) {
+                        Game.switchLevel = true;
+                    }
+                    if (ti.getId() == Id.chest && Chest.isVisible) {
+                        if (getBoundsRight().intersects(ti.getBounds()) || getBoundsLeft().intersects(ti.getBounds()))
                             ti.activated = true;
                     }
                 }
-                if (getBounds().intersects(ti.getBounds())) {
-                    if (ti.getId() == Id.gate) {
-                        Game.switchLevel();
-                    }
-                }
                 if (getBoundsBottom().intersects(ti.getBounds()) && ti.getId() != Id.coin) {
-                    setVelY(0);
-                    if (falling) falling = false;
+                        setVelY(0);
+                        if (falling) falling = false;
+
                 } else if (!falling && !jumping) {
                     falling = true;
-                    gravity = 0.8; // -0,8
+                    gravity = 0.8;
                 }
                 if (getBoundsLeft().intersects(ti.getBounds()) && ti.getId() != Id.coin) {
-                    setVelX(0);
-                    x = ti.getX() + ti.width;
+                    if(ti.getId()== Id.chest && Chest.isVisible == false)
+                    {
+                        x=ti.getX();
+                    }
+                    else
+                    {
+                        setVelX(0);
+                        x = ti.getX() + ti.width;
+                    }
                 }
                 if (getBoundsRight().intersects(ti.getBounds()) && ti.getId() != Id.coin) {
-                    setVelX(0);
-                    x = ti.getX() - ti.width;
+                    if(ti.getId()== Id.chest && Chest.isVisible == false)
+                    {
+                        x=ti.getX();
+                    }
+                    else
+                    {
+                        setVelX(0);
+                        x = ti.getX() - ti.width;
+                    }
                 }
-                //dodane
                 if (getBounds().intersects(ti.getBounds()) && ti.getId() == Id.coin) {
                     Game.coins++;
                     ti.die();
+                    Game.coinSound.play();
                 }
             }
         }
@@ -197,7 +193,7 @@ public class Player extends Entity {
 
                 }
 
-            } else if (e.getId() == Id.goblin || e.getId() == Id.towerBoss || e.getId() == Id.trap) {
+            } else if (e.getId() == Id.goblin || e.getId() == Id.towerBoss || e.getId() == Id.trap ) {
                 if (invincible) {
                     e.die();
                 } else {
@@ -205,13 +201,20 @@ public class Player extends Entity {
                         if (e.getId() != Id.towerBoss)
                         {
                             e.die();
-//                            Game.goombastomp.play();
+                            if (e.getId() == Id.goblin)
+                            {
+                                Goblin.stade = GoblinState.DEATH;
+                                Game.goblins ++;
+                                handler.goblinCreated= false;
+                            }
+
+                            Game.death2.play();
                         }
                         else if (e.attackable) {
                             e.hp--;
                             e.falling = true;
                             e.gravity = 3.0;
-                            e.bossStade = BossStade.RECOVERING;
+                            e.bossStade = BossState.RECOVERING;
                             e.attackable = false;
                             e.phaseTime = 0;
 
@@ -223,11 +226,10 @@ public class Player extends Entity {
                         if (state == PlayerState.BIG){
                             damage();
                         }
-// else if (state == PlayerState.SMALL) {
-//                            damage();
-//                        }
-                    }
-
+                         else if (state == PlayerState.SMALL) {
+                            damage();
+                        }
+                    }}}
                     else if (e.getId() == Id.lizard) {
                         if(invincible) e.die();
                         else
@@ -309,12 +311,10 @@ public class Player extends Entity {
                     }
 
                 }
-            }
-        }
             if (jumping && !goingDown) {
-                gravity -= 0.1;//0,15
+                gravity -= 0.1;
                 setVelY((int) -gravity);
-                if (gravity <= 0.0)//0,6
+                if (gravity <= 0.0)
                 {
                     jumping = false;
                     falling = true;
@@ -322,15 +322,15 @@ public class Player extends Entity {
 
             }
             if (falling && !goingDown) {
-                gravity += 0.1;//0,15
+                gravity += 0.1;
                 setVelY((int) gravity);
             }
             if (velX != 0) {
                 frameDelay++;
-                if (frameDelay >= 20)//3 // 10
+                if (frameDelay >= 20)
                 {
                     frame++;
-                    if (frame >= 6)//5 dlugosc obrazkow w jedna strone
+                    if (frame >= 6)
                         frame = 0;
                     frameDelay = 0;
                 }
@@ -342,7 +342,7 @@ public class Player extends Entity {
                         if (getBounds().intersects(t.getBounds())) {
                             switch (facing) {
                                 case 0:
-                                    setVelY(-5); // lub -1
+                                    setVelY(-5);
                                     setVelY(0);
                                     pixelsTravelled += -velY;
                                     break;
@@ -352,7 +352,7 @@ public class Player extends Entity {
                                     pixelsTravelled += velY;
                                     break;
                             }
-                            if (pixelsTravelled > t.height * 2 + height)//dodane * 2 + height
+                            if (pixelsTravelled > t.height * 2 + height)
                             {
                                 goingDown = false;
                                 pixelsTravelled = 0;
@@ -378,7 +378,6 @@ public class Player extends Entity {
                  y+=height/4;
 
                  state = PlayerState.SMALL;
-             //    Game.damage.play();
                  restoring = true;
                  restoreTime = 0;
                 return;
@@ -386,7 +385,6 @@ public class Player extends Entity {
              else if(state == PlayerState.FIRE)
              {
                  state = PlayerState.BIG;
-                 //    Game.damage.play();
                  restoring = true;
                  restoreTime = 0;
 

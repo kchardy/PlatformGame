@@ -80,6 +80,5 @@ public class Potion extends Entity {
               setVelY((int) gravity);
              }
         }
-
     }
 

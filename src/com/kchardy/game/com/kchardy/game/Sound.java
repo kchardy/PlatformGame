@@ -5,7 +5,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
-//jump - http://soundbible.com/1343-Jump.html
 public class Sound {
 
     private Clip clip;

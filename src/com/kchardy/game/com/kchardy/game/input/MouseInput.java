@@ -35,9 +35,7 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 
             if(x>=button.getX() && y>= button.getY() &&
                     x<=button.getX() + button.getWidth() && y<=button.getY()+button.getHeight())
-                button.triggerEvent(); //it's kind of like creating a ractangle or where
-            // mouse has to be in order for this code to get cold
-
+                button.triggerEvent();
         }
 
     }
@@ -56,6 +54,4 @@ public class MouseInput implements MouseListener, MouseMotionListener {
     public void mouseExited(MouseEvent e) {
 
     }
-
-
 }

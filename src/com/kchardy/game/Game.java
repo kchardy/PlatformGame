@@ -7,6 +7,10 @@ import com.kchardy.game.com.kchardy.game.graphics.gui.Launcher;
 import com.kchardy.game.com.kchardy.game.input.KeyInput;
 import com.kchardy.game.com.kchardy.game.input.MouseInput;
 import com.kchardy.game.entity.Entity;
+import com.kchardy.game.entity.mob.Goblin;;
+import com.kchardy.game.states.GoblinState;
+import com.kchardy.game.tile.Chest;
+import com.kchardy.game.tile.Gate;
 import com.kchardy.game.tile.Tile;
 
 import javax.imageio.ImageIO;
@@ -30,19 +34,29 @@ public class Game extends Canvas implements Runnable{
     private boolean running = false;
 
     private static BufferedImage[] imageLevel;
-    private static BufferedImage background;
 
     private static int playerX, playerY;
     private static int level = 0;
+    private static int gateScreenTimer = 0;
+    private static int chestScreenTimer = 0;
 
     public static int coins = 0;
     public static int lives = 5;
     public static int deathScreenTime = 0;
+    public static int winScreenTime = 0;
     public static int deathY = 0;
+    public static int goblins = 0;
+    public static int timer = 10_000*(level + 1);
+    public static int goblinsLimit = 1;
 
     public static boolean deathScreen = true;
     public static boolean gameOver = false;
     public static boolean playing = false;
+    public static boolean winScreen = false;
+    public static boolean switchLevel = false;
+    public static boolean gateOpened = false;
+    public static boolean findChest = false;
+
 
     public static Handler handler;
     public static SpriteSheet sheet;
@@ -53,10 +67,10 @@ public class Game extends Canvas implements Runnable{
     public static Sprite player[] = new Sprite[12];
     public static Sprite playerStaff[] = new Sprite[12];
     public static Sprite goblin[] = new Sprite[10];
+    public static Sprite lizard[] = new Sprite[8];
+    public static Sprite lizardRolling[] = new Sprite[8];
     public static Sprite particle[] = new Sprite[6];
-//    public static Sprite fireball[] = new Sprite[3];
-    public static Sprite fireball;
-
+    public static Sprite fireball[] = new Sprite[10];
 
     public static Sprite brick;
     public static Sprite growPotion;
@@ -67,14 +81,17 @@ public class Game extends Canvas implements Runnable{
     public static Sprite coin;
     public static Sprite staff;
     public static Sprite gate;
+    public static Sprite fireball1;
+    public static Sprite fireball2;
 
 
     public static Sound jump;
-    public static Sound goombastomp;
-    public static Sound levelcomplite;
-    public static Sound losealife;
-    public static Sound themesong;
-
+    public static Sound death2;
+    public static Sound potionSound;
+    public static Sound deathSound;
+    public static Sound shotSound;
+    public static Sound coinSound;
+    public static Sound gatesSound;
 
     public Game()
     {
@@ -87,7 +104,7 @@ public class Game extends Canvas implements Runnable{
     private void init()
     {
         handler = new Handler();
-        sheet = new SpriteSheet("/spritesheet2.png");
+        sheet = new SpriteSheet("/spritesheet.png");
         cam = new Camera();
         launcher = new Launcher();
         mouseInput = new MouseInput();
@@ -105,7 +122,8 @@ public class Game extends Canvas implements Runnable{
         lifePotion = new Sprite(sheet, 6,1);
         gate = new Sprite(sheet,7,1 );
         magicBean = new Sprite(sheet,8,1);
-            fireball = new Sprite(sheet, 1, 12);
+        fireball1 = new Sprite(sheet, 4, 12);
+        fireball2 = new Sprite(sheet, 8, 12);
 
         for(int i = 0; i < player.length; i++)
         {
@@ -115,6 +133,16 @@ public class Game extends Canvas implements Runnable{
         for(int i = 0; i < goblin.length; i++)
         {
             goblin[i] = new Sprite(sheet, i+1, 15);
+        }
+
+        for(int i = 0; i < lizard.length; i++)
+        {
+            lizard[i] = new Sprite(sheet, i+1, 10);
+        }
+
+        for(int i = 0; i < lizardRolling.length; i++)
+        {
+            lizardRolling[i] = new Sprite(sheet, i+1, 11);
         }
 
         for(int i = 0; i < playerStaff.length; i++)
@@ -127,37 +155,31 @@ public class Game extends Canvas implements Runnable{
             particle[i] = new Sprite(sheet, i+1, 13);
         }
 
-//        for(int i = 0; i < fireball.length; i++)
-//        {
-//            fireball[i] = new Sprite(sheet, i+1, 12);
-//        }
+        for(int i = 0; i < fireball.length; i++)
+        {
+            fireball[i] = new Sprite(sheet, i+1, 12);
+        }
 
 
 
         try
         {
-//            for (int i = 0;i<imageLevel.length;i++)
-//            {
-//                imageLevel[i] = ImageIO.read(getClass().getResource("/level" + level + ".png"));//level3
-//            }
-                imageLevel[1] = ImageIO.read(getClass().getResource("/level3.png" )); //"/level" + level + ".png"));//level3
-                imageLevel[0] = ImageIO.read(getClass().getResource("/level0.png" )); //"/level" + level + ".png"));//level3
-            background = ImageIO.read(getClass().getResource("/background.jpg"));
+            imageLevel[0] = ImageIO.read(getClass().getResource("/level0.png" ));
+            imageLevel[1] = ImageIO.read(getClass().getResource("/level1.png" ));
         }
         catch(IOException e)
         {
             e.printStackTrace();
         }
 
-     //   jump = new Sound("/jump.mp3"); zmienic na .wave lub "/audio/jump.wav
-//        jump = new Sound("/jump.mp3"); make this same for others
-//        jump = new Sound("/jump.mp3");
-//        jump = new Sound("/jump.mp3");
-//        jump = new Sound("/jump.mp3");
+        jump = new Sound("/jump.wav");
+        coinSound = new Sound("/coin.wav");
+        potionSound = new Sound("/potion.wav");
+        deathSound = new Sound("/death.wav");
+        death2 = new Sound("/death2.wav");
+        shotSound = new Sound("/shot.wav");
+        gatesSound = new Sound("/teleport.wav");
 
-   //     handler.createLevel(imageLevel);
-
-       // handler.addEntity(new Player(100, 500, 64, 64, Id.player, handler));//
     }
 
     private synchronized void start()
@@ -177,7 +199,6 @@ public class Game extends Canvas implements Runnable{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -222,25 +243,28 @@ public class Game extends Canvas implements Runnable{
             return;
         }
         Graphics g = bs.getDrawGraphics();
-        g.setColor(Color.BLACK); //black background
+        g.setColor(Color.BLACK);
         g.fillRect(0,0, getWidth(), getHeight());
+
         if(!deathScreen)
         {
-            g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
-
-//            g.drawImage(coin.getBufferedImage(),20,20, 75, 75, null);
-//            g.setColor(Color.WHITE);
-//            g.setFont(new Font("Courier", Font.BOLD, 20));
-//            g.drawString("x" + coins, 100, 95);
+            g.setColor(Color.BLACK);
+            g.fillRect(0,0, getWidth(), getHeight());
         }
         if(deathScreen)
         {
-            if(!gameOver)
+            if(!gameOver && !winScreen)
             {
                 g.drawImage(player[7].getBufferedImage(),(WIDTH*SCALE)/2,(HEIGHT*SCALE)/2, 75, 75, null);
                 g.setColor(Color.WHITE);
                 g.setFont(new Font("Georgia", Font.BOLD, 50));
                 g.drawString("x " + lives, (WIDTH*SCALE)/2 + 100, (HEIGHT*SCALE)/2 + 70);
+            }
+            else if(winScreen && !gameOver)
+            {
+                g.setColor(Color.WHITE);
+                g.setFont(new Font("Georgia", Font.BOLD, 50));
+                g.drawString("YOU WIN!", (WIDTH*SCALE)/2 + 100, (HEIGHT*SCALE)/2 + 70);
             }
             else
             {
@@ -248,6 +272,17 @@ public class Game extends Canvas implements Runnable{
                 g.setFont(new Font("Georgia", Font.BOLD, 50));
                 g.drawString("GAME OVER", (WIDTH*SCALE)/2 + 100, (HEIGHT*SCALE)/2 + 70);
             }
+
+            handler.created = false;
+            handler.goblinCreated = false;
+            coins = 0;
+
+            Chest.activated = false;
+            Gate.activated = false;
+            findChest = false;
+            gateOpened = false;
+
+
         }
         if(playing)
             g.translate(cam.getX(), cam.getY());
@@ -262,7 +297,18 @@ public class Game extends Canvas implements Runnable{
     public void update()
     {
         if(playing)
+        {
             handler.tick();
+            timer--;
+
+            if(timer<=0)
+            {
+                timer =0;
+
+                deathScreen = true;
+                gameOver = false;
+            }
+        }
 
         for(Entity e:handler.entity)
         {
@@ -282,8 +328,7 @@ public class Game extends Canvas implements Runnable{
                 deathScreenTime = 0;
                 handler.clearLevel();
                 handler.createLevel(imageLevel[level]);
-
-              //  themesong.play();
+                timer = 10_000*(level+1);
             }
             else if(gameOver)
             {
@@ -292,8 +337,53 @@ public class Game extends Canvas implements Runnable{
                 playing = false;
                 gameOver = false;
             }
-
         }
+        if(switchLevel)
+        {
+            deathScreen = true;
+            switchLevel();
+            goblins = 0;
+            switchLevel = false;
+        }
+        if(Goblin.stade == GoblinState.DEATH && goblins < goblinsLimit)
+        {
+            handler.goblinCreated = false;
+            handler.createGoblin();
+        }
+        else if(goblins == goblinsLimit)
+        {
+            Chest.isVisible = true;
+            findChest = true;
+        }
+        if(Chest.activated && level == 1)
+        {
+            deathScreen = true;
+            winScreen = true;
+        }
+
+        if(coins == 50)
+        {
+            Gate.isVisible = true;
+            gateOpened = true;
+        }
+        if(gateOpened)
+        {
+            gateScreenTimer++;
+            if(gateScreenTimer >= 360)
+                gateOpened = false;
+        }
+        if(findChest)
+        {
+            chestScreenTimer++;
+            if(chestScreenTimer >= 360)
+                findChest = false;
+        }
+
+        if(winScreen)
+            winScreenTime++;
+        if(winScreenTime >= 1000)
+            System.exit(0);
+
         render();
     }
 
@@ -313,8 +403,7 @@ public class Game extends Canvas implements Runnable{
         handler.clearLevel();
         handler.createLevel(imageLevel[level]);
 
-        themesong.close();
-        levelcomplite.play();
+        gatesSound.play();
     }
 
     public static Rectangle getVisiableArea()

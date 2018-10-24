@@ -3,7 +3,7 @@ package com.kchardy.game.entity;
 import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
-import com.kchardy.game.states.BossStade;
+import com.kchardy.game.states.BossState;
 import com.kchardy.game.states.LizardState;
 import com.kchardy.game.states.PlayerState;
 
@@ -18,7 +18,7 @@ public abstract class Entity {
     public int x, y;
     public int velX, velY;
     public int width, height;
-    public int facing = 0;  //0 - left, 1 - right
+    public int facing = 0;
     public int hp;
     public int phaseTime;
     public int type;
@@ -33,7 +33,7 @@ public abstract class Entity {
 
 
     public Id id;
-    public BossStade bossStade;
+    public BossState bossStade;
     public LizardState lizardState;
 
     public double gravity = 0.0;
@@ -65,9 +65,11 @@ public abstract class Entity {
 
             if(lives <= 0)
             gameOver = true;
-//            Game.losealife.play();
+            Game.deathSound.play();
         }
-//        handler.removeEntity(this);
+        else
+            Game.death2.play();
+
     }
 
     public int getX() {

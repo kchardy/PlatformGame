@@ -13,6 +13,8 @@ import static com.kchardy.game.Game.chest;
 
 public class Chest extends Tile {
 
+    public static boolean isVisible = false;
+
     private Sprite powerUp;
     private boolean poppedUp = false;
     private int spriteY = getY();
@@ -26,11 +28,11 @@ public class Chest extends Tile {
 
     @Override
     public void render(Graphics g) {
-        if(!poppedUp)
+        if(!poppedUp && isVisible)
             g.drawImage(chest.getBufferedImage(), x, spriteY, width, height, null);
-        if(!activated)
+        if(!activated && isVisible)
             g.drawImage(chest.getBufferedImage(), x, y, width, height, null);
-        else
+        else if(activated && isVisible)
             g.drawImage(Game.openedChest.getBufferedImage(), x, y, width, height, null);
     }
 
@@ -44,7 +46,7 @@ public class Chest extends Tile {
                 if(powerUp == Game.lifePotion || powerUp == Game.growPotion)
                      handler.addEntity(new Potion(x, spriteY, width, height, Id.potion, handler, type));
                 else if(powerUp == Game.staff)
-                    handler.addEntity(new Staff(x, spriteY, width, height, Id.fireball, handler));
+                    handler.addEntity(new Staff(x, spriteY, width, height, Id.staff, handler));
 
                 poppedUp = true;
 

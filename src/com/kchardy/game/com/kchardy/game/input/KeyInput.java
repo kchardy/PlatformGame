@@ -13,7 +13,6 @@ import java.awt.event.KeyListener;
 
 public class KeyInput implements KeyListener {
 
-    private boolean fire;
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -48,16 +47,9 @@ public class KeyInput implements KeyListener {
                             {
                                 en.jumping = true;
                                 en.gravity = 9.0;
-                           //     Game.jump.play();
+                                Game.jump.play();
                             }
                         }
-                        // en.velY += -1;  przyspiesza jak dluzej przytrzymasz
-                        // en.setVelY(-1);
-//                        if(!en.jumping)
-//                        {
-//                            en.jumping = true;
-//                            en.gravity = 9.0;
-//                        }
                         break;
                   case KeyEvent.VK_S:
                     for(int j = 0; j<Game.handler.tile.size();j++)
@@ -76,12 +68,10 @@ public class KeyInput implements KeyListener {
                     }
                     break;
                     case KeyEvent.VK_A:
-                        // en.velX += -1;
                         en.setVelX(-1);
                         en.facing = 1;
                         break;
                     case KeyEvent.VK_D:
-                        //en.velX += 1;
                         en.setVelX(1);
                         en.facing = 0;
                         break;
@@ -89,17 +79,24 @@ public class KeyInput implements KeyListener {
                         en.die();
                         break;
                     case KeyEvent.VK_SPACE:
-                        if(en.state == PlayerState.FIRE && !fire)
-                        switch (en.facing)
-                        {
-                            case 0:
-                                Game.handler.addEntity(new Fireball(en.getX()-24, en.getY()+12, 24, 24, Id.fireball, Game.handler, en.facing));
-                                fire = true;
-                                break;
-                            case 1:
-                                Game.handler.addEntity(new Fireball(en.getX()+ en.width, en.getY()+12, 24, 24, Id.fireball, Game.handler, en.facing));
-                                fire = true;
-                                break;
+                        if(Game.coins>0){
+                             if(!Fireball.fire)
+                            switch (en.facing)
+                            {
+                                case 0:
+                                    Game.handler.addEntity(new Fireball(en.getX()+ en.width, en.getY()+12, 24, 24, Id.fireball, Game.handler, en.facing));
+                                    Fireball.fire = true;
+                                    Game.coins--;
+                                    Game.shotSound.play();
+                                    break;
+                                case 1:
+                                    Game.handler.addEntity(new Fireball(en.getX()- en.width, en.getY()+12, 24, 24, Id.fireball, Game.handler, en.facing));
+                                    Fireball.fire = true;
+                                    Game.coins--;
+                                    Game.shotSound.play();
+
+                                    break;
+                            }
                         }
                         break;
 
@@ -133,7 +130,7 @@ public class KeyInput implements KeyListener {
                         en.setVelX(0);
                         break;
                     case KeyEvent.VK_SPACE:
-                        fire = false;
+                        Fireball.fire = false;
                         break;
                 }
             }

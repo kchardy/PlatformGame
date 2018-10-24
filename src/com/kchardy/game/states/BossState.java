@@ -1,5 +1,5 @@
 package com.kchardy.game.states;
 
-public enum BossStade {
+public enum BossState {
     IDLE, SPINNING, JUMPING, RUNNING, RECOVERING
 }

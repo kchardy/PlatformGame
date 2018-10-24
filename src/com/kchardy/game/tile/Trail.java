@@ -1,6 +1,5 @@
 package com.kchardy.game.tile;
 
-import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
 

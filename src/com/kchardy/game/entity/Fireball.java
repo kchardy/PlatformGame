@@ -3,6 +3,8 @@ package com.kchardy.game.entity;
 import com.kchardy.game.Game;
 import com.kchardy.game.Handler;
 import com.kchardy.game.Id;
+import com.kchardy.game.entity.mob.Goblin;
+import com.kchardy.game.states.GoblinState;
 import com.kchardy.game.tile.Tile;
 
 import java.awt.*;
@@ -11,6 +13,11 @@ import java.awt.*;
 public class Fireball extends Entity {
 
     private int frame = 0;
+    private int frameDelay = 0;
+
+    public int fireTime = 0;
+    public static boolean fire;
+
 
 
     public Fireball(int x, int y, int width, int height, Id id, Handler handler, int facing) {
@@ -19,33 +26,42 @@ public class Fireball extends Entity {
         switch (facing)
         {
             case  0:
-                setVelX(-5);
+                setVelX(5);
                 break;
             case 1:
-                setVelX(5);
+                setVelX(-5);
                 break;
         }
     }
 
     @Override
     public void render(Graphics g) {
-        g.drawImage(Game.fireball.getBufferedImage(), getX(), getY(), width, height, null);
-
-//        if(facing == 0)
-//        {
-//            g.drawImage(Game.fireball[frame+5].getBufferedImage(),x, y, width, height, null);//+5
-//        }
-//        else if(facing == 1)
-//        {
-//            g.drawImage(Game.fireball[frame].getBufferedImage(),x, y, width, height, null);
-//        }
+        if(facing == 1)
+        {
+            g.drawImage(Game.fireball2.getBufferedImage(),x, y, width, height, null);
+        }
+        else if(facing == 0)
+        {
+            g.drawImage(Game.fireball1.getBufferedImage(),x, y, width, height, null);
+        }
     }
 
     @Override
     public void tick() {
 
         x+=velX;
-        y+=velY;
+
+        if(fire)
+        {
+            fireTime++;
+            if(fireTime>=360)
+            {
+                fire = false;
+                fireTime = 0;
+            }
+            else
+                fire = true;
+        }
 
         for(int i =0;i<handler.tile.size();i++)
         {
@@ -79,15 +95,21 @@ public class Fireball extends Entity {
                 {
                     e.die();
                     die();
+                    if (e.getId() == Id.goblin)
+                    {
+                        Goblin.stade = GoblinState.DEATH;
+                        Game.goblins ++;
+                        handler.goblinCreated= false;
+                    }
                 }
             }
         }
 
         if (jumping)
         {
-            gravity -= 0.15;//0,17
-            setVelY((int) -gravity);
-            if (gravity <= 0.5)//0,6
+            gravity -= 0.15;
+            setVelY((int) - gravity);
+            if (gravity <= 0.5)
             {
                 jumping = false;
                 falling = true;
@@ -95,8 +117,20 @@ public class Fireball extends Entity {
 
         }
         if (falling) {
-            gravity += 0.15;//0,17//0,4 faster
+            gravity += 0.2;
             setVelY((int) gravity);
+        }
+
+        if(velX!=0)
+        {
+            frameDelay++;
+            if(frameDelay >= 5)
+            {
+                frame++;
+                if(frame >= 4)
+                    frame = 0;
+                frameDelay = 0;
+            }
         }
     }
 }

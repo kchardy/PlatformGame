@@ -48,9 +48,9 @@ public class Trap extends Entity {
         if(moving)
         {
             if(hide)
-                setVelY(-1);//-3
+                setVelY(-1);
             else
-                setVelY(1);//3;
+                setVelY(1);
 
             pixelsTravelled +=velY;
 
